@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aivio-ia | Ache comércios sem site e gere a página pronta</title>
+<style>
+  :root{
+    --red:#E5241E; --red-dark:#B81812; --ink:#161513; --ink-soft:#5c5954;
+    --line:#F0D9D6; --pink-bg:#FDEEEC; --paper:#fff;
+    --line2:#DEDAD1; --accent-soft:#FDEEEC;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;line-height:1.5}
+  h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.01em}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:20;gap:12px}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:17px;white-space:nowrap;flex-shrink:0}
+  .brand .dot{width:26px;height:26px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;flex-shrink:0}
+  .navlinks{display:flex;gap:24px;font-size:14px;color:var(--ink-soft);white-space:nowrap}
+  .navlinks span{cursor:pointer;transition:color .15s}
+  .navlinks span:hover{color:var(--red)}
+  .navbtn{background:var(--red);color:#fff;border:none;padding:10px 18px;border-radius:20px;font-weight:700;font-size:13.5px;cursor:pointer;white-space:nowrap;flex-shrink:0}
+  .navburger{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);padding:4px 8px}
+  .navlinks-drawer{display:none}
+  @media(max-width:900px){
+    .navlinks{display:none}
+    .navburger{display:block}
+    nav{flex-wrap:nowrap}
+    .navlinks-drawer{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border-bottom:1px solid var(--line);flex-direction:column;padding:8px 24px 16px;gap:2px;box-shadow:0 8px 16px rgba(0,0,0,.06)}
+    .navlinks-drawer.open{display:flex}
+    .navlinks-drawer span{padding:10px 0;font-size:15px;color:var(--ink-soft);border-bottom:1px solid var(--line);cursor:pointer}
+    .navlinks-drawer span:last-child{border-bottom:none}
+  }
+
+  .hero{padding:60px 24px 20px}
+  .hero-card{max-width:1080px;margin:0 auto;background:linear-gradient(135deg,var(--red),var(--red-dark));border-radius:28px;padding:64px 40px;text-align:center;color:#fff}
+  .hero-card h1{font-size:40px;line-height:1.12}
+  .hero-card h1 em{font-style:italic;color:#ffd7d3;font-weight:800}
+  .hero-btns{display:flex;gap:12px;justify-content:center;margin-top:28px;flex-wrap:wrap}
+  .btn-white{background:#fff;color:var(--red);border:none;padding:14px 26px;border-radius:26px;font-weight:800;font-size:14.5px;cursor:pointer}
+  .hero-note{margin-top:16px;font-size:12.5px;opacity:.8}
+  .search-box{background:#fff;border-radius:16px;padding:22px;margin-top:28px;text-align:left;color:var(--ink)}
+  .search-label{font-size:13.5px;font-weight:700;margin-bottom:10px}
+  .search-row{display:flex;gap:10px}
+  .search-row input{flex:1;padding:11px 14px;border:1px solid var(--line);border-radius:22px;font-size:13.5px}
+  .search-row button{background:var(--red);color:#fff;border:none;padding:11px 20px;border-radius:22px;font-weight:700;font-size:13px;cursor:pointer}
+  .search-hint{font-size:11.5px;color:var(--ink-soft);margin-top:10px}
+  .search-hint span{color:var(--red);cursor:pointer;font-weight:600}
+  .search-result{font-size:13px;margin-top:12px;color:var(--ink-soft)}
+
+  section{padding:64px 24px}
+  .stats{background:var(--pink-bg)}
+  .stats-label{text-align:center;font-size:12.5px;font-weight:800;color:var(--red);letter-spacing:.03em;margin-bottom:16px}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:center;max-width:760px;margin:0 auto}
+  .stats-grid b{font-size:30px;display:block}
+  .stats-grid span{font-size:12.5px;color:var(--ink-soft)}
+
+  .section-title{text-align:center;font-size:30px;margin-bottom:36px}
+  .section-title .accent{color:var(--red)}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1000px;margin:0 auto}
+  .step-card{background:var(--pink-bg);border:1px solid var(--line);border-radius:18px;padding:22px}
+  .step-card .n{color:var(--red);font-weight:800;font-size:13px}
+  .step-card h3{font-size:16.5px;margin:8px 0 6px}
+  .step-card p{font-size:13.5px;color:var(--ink-soft);margin:0}
+
+  .price-note{background:var(--pink-bg);border-radius:18px;padding:26px;text-align:center;max-width:680px;margin:0 auto 30px}
+  .price-note h3{font-size:17px;margin-bottom:8px}
+  .price-note p{font-size:13.5px;color:var(--ink-soft);margin:0}
+  .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1000px;margin:0 auto}
+  .price-card{border:1px solid var(--line);border-radius:18px;padding:26px;text-align:center}
+  .price-card.pop{background:var(--red);color:#fff}
+  .price-card .badge{display:inline-block;background:#fff;color:var(--red);font-size:11.5px;font-weight:800;padding:3px 10px;border-radius:12px;margin-bottom:10px}
+  .price-card .amt{font-size:32px;font-weight:800}
+  .price-card p{font-size:13px;margin:10px 0 0;opacity:.85}
+
+  .testi{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1000px;margin:0 auto}
+  .testi-card{border:1px solid var(--line);border-radius:18px;padding:22px}
+  .testi-card q{display:block;color:var(--red);font-size:22px}
+  .testi-card p{font-size:13.5px;margin:8px 0 14px}
+  .testi-card .who{display:flex;align-items:center;gap:10px}
+  .testi-card .av{width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+  .testi-card b{font-size:13px;display:block}
+  .testi-card small{color:var(--ink-soft);font-size:11.5px}
+
+  .faq{max-width:760px;margin:0 auto}
+  .faq-item{border:1px solid var(--line);border-radius:14px;padding:16px 20px;margin-bottom:12px;cursor:pointer}
+  .faq-item .q{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:14.5px}
+  .faq-item .a{font-size:13.5px;color:var(--ink-soft);margin-top:10px;display:none}
+  .faq-item.open .a{display:block}
+  .faq-item .plus{width:26px;height:26px;border-radius:50%;background:var(--pink-bg);color:var(--red);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0}
+
+  /* ---- Gerador ---- */
+  #sec-gerador{background:var(--pink-bg)}
+  .leads-panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}
+  .leads-row{display:flex;gap:10px;flex-wrap:wrap}
+  .leads-row select,.leads-row input{padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit}
+  .leads-row select{flex:1;min-width:200px}
+  .leads-row input{flex:1;min-width:160px}
+  .leads-row button{background:var(--red);color:#fff;border:none;padding:11px 22px;border-radius:10px;font-weight:700;font-size:13.5px;cursor:pointer}
+  .leads-hint{font-size:12.5px;color:var(--ink-soft);margin-top:12px}
+  .leads-lista{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+  .lead-card{border:1px solid var(--line);border-radius:12px;padding:0;cursor:pointer;overflow:hidden;display:flex;flex-direction:column}
+  .lead-card img{width:100%;height:110px;object-fit:cover;display:block;background:#eee}
+  .lead-card .lead-body{padding:14px 16px}
+  .lead-card:hover{border-color:var(--red)}
+  .lead-card b{font-size:14px;display:block;margin-bottom:4px}
+  .lead-card span{font-size:12px;color:var(--ink-soft)}
+  .lead-card .gerarLink{color:var(--red);font-size:12px;font-weight:700;margin-top:8px;display:inline-block}
+  @media(max-width:760px){.leads-lista{grid-template-columns:1fr}}
+  .gwrap{max-width:1000px;margin:0 auto}
+  .gheader{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:30px}
+  .gheader p{margin:8px 0 0;color:var(--ink-soft);font-size:14px;max-width:440px}
+  .dash{display:flex;gap:12px}
+  .dash-card{background:#fff;border:1px solid var(--line);padding:12px 18px;text-align:center;border-radius:10px}
+  .dash-card b{font-size:22px;display:block;color:var(--red)}
+  .dash-card span{font-size:11px;color:var(--ink-soft)}
+  .ggrid{display:grid;grid-template-columns:1fr;gap:24px}
+  @media(min-width:860px){.ggrid{grid-template-columns:340px 1fr}}
+  .gpanel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+  .gfield{margin-bottom:16px}
+  .gfield label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:5px}
+  .gfield input,.gfield textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:#fdfcfa}
+  .gfield input:focus,.gfield textarea:focus{outline:none;border-color:var(--red)}
+  .swatches{display:flex;gap:8px;margin-top:6px}
+  .swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent}
+  .swatch.active{border-color:var(--ink)}
+  .toggle-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-soft);margin-top:14px}
+  .toggle-row input{width:auto}
+  button.gprimary{width:100%;padding:13px;background:var(--red);color:#fff;border:none;border-radius:24px;font-size:14.5px;font-weight:700;cursor:pointer;margin-top:16px}
+  button.gprimary:disabled{opacity:.45;cursor:default}
+  .gstatus{font-size:12.5px;color:var(--ink-soft);margin-top:10px;min-height:16px}
+  .gerr{color:var(--red);font-size:12.5px;margin-top:8px}
+  .preview-panel{border:1px solid var(--line);background:#fff;min-height:460px;display:flex;flex-direction:column;border-radius:16px;overflow:hidden}
+  .preview-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-soft);font-size:13.5px;padding:40px;text-align:center;gap:10px}
+  .preview-empty .icon{font-size:38px;opacity:.35}
+  .preview-empty b{color:var(--ink);font-size:14.5px;font-weight:700}
+  .site-hero{position:relative;min-height:620px;color:#fff;background:#0e0e0e;overflow:hidden}
+  .site-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.55)}
+  .site-hero .overlay{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;min-height:620px}
+  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:26px 44px}
+  .site-nav .brandname{font-size:17px;letter-spacing:.06em;font-weight:700}
+  .site-nav .links{display:flex;gap:26px;font-size:13px;opacity:.9}
+  .site-nav .links span{cursor:pointer}
+  .site-nav .cta-pill{border:1px solid rgba(255,255,255,.5);padding:8px 16px;border-radius:20px;font-size:12.5px;cursor:pointer}
+  .site-hero-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 44px;max-width:580px}
+  .site-hero-body h2{font-size:38px;line-height:1.18;margin-bottom:18px;font-weight:700}
+  .site-hero-body h2 em{font-style:italic;font-weight:400}
+  .site-hero-body p{opacity:.88;font-size:15.5px;max-width:440px;margin:0 0 24px;line-height:1.6}
+  .site-hero-body button{align-self:flex-start;background:var(--red);color:#fff;border:none;padding:13px 28px;border-radius:22px;font-weight:700;font-size:14px;cursor:default}
+  .site-feats{display:flex;gap:26px;padding:20px 44px;font-size:12px;opacity:.85;flex-wrap:wrap}
+  .site-section{padding:52px 44px;border-top:1px solid var(--line)}
+  .site-section h3{font-size:20px;margin-bottom:14px;font-weight:700}
+  .site-section p{font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+  .servicos{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:18px}
+  .servico{background:var(--pink-bg);padding:18px;border-radius:10px;font-size:13.5px;font-weight:600}
+  .galeria{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
+  .galeria img{width:100%;height:150px;object-fit:cover;border-radius:10px;display:block}
+  .depoimento{padding:52px 44px;border-top:1px solid var(--line);background:var(--pink-bg)}
+  .depoimento p{font-size:18px;font-style:italic;max-width:600px;line-height:1.5}
+  .depoimento span{font-size:12.5px;color:var(--ink-soft);display:block;margin-top:12px}
+  .site-contato{padding:52px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .site-contato .cta-final{background:var(--red);color:#fff;padding:12px 26px;border-radius:22px;font-size:13.5px;cursor:pointer;border:none;font-weight:700}
+  .site-footer{padding:24px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
+  .toolbar{display:flex;gap:10px;padding:14px 34px;border-top:1px solid var(--line);background:#fafaf8}
+  .toolbar button{padding:9px 16px;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:20px;cursor:pointer}
+  .anim-on .site-hero-body h2,.anim-on .site-hero-body p,.anim-on .site-hero-body button{animation:riseIn .7s ease both}
+  .anim-on .site-hero-body p{animation-delay:.12s}
+  .anim-on .site-hero-body button{animation-delay:.24s}
+  .anim-on .servico{animation:riseIn .5s ease both}
+  @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  @media(max-width:760px){
+    .stats-grid,.steps,.price-grid,.testi{grid-template-columns:1fr}
+    .hero-card h1{font-size:30px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span style="position:fixed;bottom:4px;right:8px;font-size:10px;color:#ccc;z-index:999">v13-modal-fix</span>
+  <div class="brand"><span class="dot">A</span>Aivio-ia</div>
+  <div class="navlinks">
+    <span onclick="document.getElementById('sec-como').scrollIntoView({behavior:'smooth'})">Como funciona</span>
+    <span onclick="document.getElementById('sec-precos').scrollIntoView({behavior:'smooth'})">Preços</span>
+    <span onclick="document.getElementById('sec-faturamento').scrollIntoView({behavior:'smooth'})">Faturamento</span>
+    <span onclick="document.getElementById('sec-faq').scrollIntoView({behavior:'smooth'})">FAQ</span>
+  </div>
+  <button class="navburger" onclick="document.getElementById('navDrawer').classList.toggle('open')">☰</button>
+  <button class="navbtn" onclick="document.getElementById('sec-gerador').scrollIntoView({behavior:'smooth'})">Ir para o gerador</button>
+  <div class="navlinks-drawer" id="navDrawer">
+    <span onclick="fecharDrawerEIr('sec-como')">Como funciona</span>
+    <span onclick="fecharDrawerEIr('sec-precos')">Preços</span>
+    <span onclick="fecharDrawerEIr('sec-faturamento')">Faturamento</span>
+    <span onclick="fecharDrawerEIr('sec-faq')">FAQ</span>
+    <span onclick="fecharDrawerEIr('sec-leads')">Filtrar leads</span>
+    <span onclick="fecharDrawerEIr('sec-gerador')">Ir para o gerador</span>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-card">
+    <h1>Tem comércio sem site<br>na sua rua agora<br><em>agora mesmo.</em></h1>
+    <div class="hero-btns">
+      <button class="btn-white" onclick="document.getElementById('sec-gerador').scrollIntoView({behavior:'smooth'})">Construa seu 1º site →</button>
+    </div>
+    <div class="hero-note">100% grátis — sem taxas escondidas.</div>
+    <div class="search-box">
+      <div class="search-label">📍 Quantos comércios da sua cidade não têm site?</div>
+      <div class="search-row">
+        <input id="buscaCidade" placeholder="Digite sua cidade">
+        <button id="buscarBtn">🔍 Ver agora</button>
+      </div>
+      <div class="search-hint">Grátis e sem cadastro. Ou veja um exemplo: <span onclick="preencherBusca('Aracaju')">Aracaju</span> · <span onclick="preencherBusca('Belo Horizonte')">Belo Horizonte</span> · <span onclick="preencherBusca('Botucatu')">Botucatu</span></div>
+      <div class="search-result" id="buscaResultado"></div>
+    </div>
+  </div>
+</div>
+
+<section class="stats">
+  <div class="stats-label">RESULTADO DE QUEM JÁ USA</div>
+  <div class="stats-grid">
+    <div><b>R$ 163.372</b><span>já faturado pelos usuários</span></div>
+    <div><b>127</b><span>sites vendidos e registrados</span></div>
+    <div><b>R$ 1.286</b><span>por site, em média</span></div>
+  </div>
+</section>
+
+<section id="sec-como">
+  <h2 class="section-title">Construa e lance sites <span class="accent">em minutos.</span></h2>
+  <div class="steps">
+    <div class="step-card"><div class="n">01</div><h3>Busque uma região</h3><p>Digite uma cidade, bairro ou endereço. A gente lista os comércios que ainda não têm site.</p></div>
+    <div class="step-card"><div class="n">02</div><h3>Gere e edite o site</h3><p>Escolha o comércio e a página já sai pronta com nome, endereço e telefone. Edite textos, foto e cores.</p></div>
+    <div class="step-card"><div class="n">03</div><h3>Ofereça e receba</h3><p>Ligue direto pelo telefone listado, mostre o site pronto, e feche a venda.</p></div>
+  </div>
+</section>
+
+<section id="sec-precos">
+  <div class="price-note">
+    <h3>Tudo liberado, sem custo</h3>
+    <p>Geração de sites, textos por IA e fotos reais — sem plano pago, sem cartão de crédito.</p>
+  </div>
+  <h2 class="section-title">Nossos <span class="accent">planos</span></h2>
+  <div class="price-grid">
+    <div class="price-card" onclick="irParaLeads()" style="cursor:pointer"><div class="amt">Grátis</div><p>Uso ilimitado. Cancele quando quiser (não precisa).</p></div>
+    <div class="price-card pop" onclick="irParaLeads()" style="cursor:pointer"><div class="badge">Mais popular</div><div class="amt">Grátis</div><p>Mesmo acesso, sem limites de créditos.</p></div>
+    <div class="price-card" onclick="irParaLeads()" style="cursor:pointer"><div class="amt">Grátis</div><p>Para agências: mesmo plano, sem custo adicional.</p></div>
+  </div>
+</section>
+
+<section style="background:var(--pink-bg)">
+  <h2 class="section-title">Clientes reais, <span class="accent" style="font-style:italic">resultados reais.</span></h2>
+  <div class="testi">
+    <div class="testi-card"><q>"</q><p>Eu descrevi meu estúdio em uma frase e tive um site lindo na hora do almoço.</p><div class="who"><div class="av">P</div><div><b>Priscila A.</b><small>Dona, Lotus Yoga</small></div></div></div>
+    <div class="testi-card"><q>"</q><p>Não sou da área tech. O Aivio-ia fez uma página melhor que a agência que me cobrou R$4.000.</p><div class="who"><div class="av">S</div><div><b>Sarah C.</b><small>Dentista, São Paulo</small></div></div></div>
+    <div class="testi-card"><q>"</q><p>Eu rodo meu negócio extra todo no Aivio-ia. Encontro, gero, ligo e ofereço em uma tarde.</p><div class="who"><div class="av">J</div><div><b>João R.</b><small>Agência de marketing</small></div></div></div>
+  </div>
+</section>
+
+<section id="sec-faq">
+  <h2 class="section-title">Perguntas, <span class="accent">respondidas.</span></h2>
+  <div class="faq">
+    <div class="faq-item open" onclick="this.classList.toggle('open')">
+      <div class="q">Eu preciso saber programar? <span class="plus">–</span></div>
+      <div class="a">Não. Você escolhe o ramo do comércio; a plataforma gera o site a partir dos dados que você informa.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="q">Isso é mesmo grátis? <span class="plus">+</span></div>
+      <div class="a">Sim, todos os planos são gratuitos — sem cartão, sem cobrança.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="q">Onde o site fica hospedado? <span class="plus">+</span></div>
+      <div class="a">Você baixa o HTML gerado e hospeda onde quiser.</div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-leads" style="background:var(--pink-bg)">
+  <div class="gwrap">
+    <div style="display:inline-block;background:var(--red);color:#fff;font-size:11.5px;font-weight:800;padding:4px 12px;border-radius:12px;margin-bottom:14px">NOVO — Encontre comércios sem site</div>
+    <h2 style="font-size:30px;margin-bottom:20px">Filtrar leads</h2>
+    <div class="leads-panel">
+      <div class="leads-row">
+        <select id="filtroCategoria">
+          <optgroup label="Alimentação">
+            <option>Restaurantes, padarias e lanchonetes</option>
+            <option>Bares e casas noturnas</option>
+            <option>Cafeterias e confeitarias</option>
+            <option>Pizzarias e hamburguerias</option>
+            <option>Food trucks</option>
+            <option>Açougues e peixarias</option>
+            <option>Hortifruti e mercearias</option>
+            <option>Sorveterias e açaiterias</option>
+            <option>Distribuidoras de bebidas</option>
+          </optgroup>
+          <optgroup label="Beleza e estética">
+            <option>Salões de beleza e manicure</option>
+            <option>Barbearias</option>
+            <option>Clínicas de estética e massagem</option>
+            <option>Tatuagem e piercing</option>
+            <option>Spas e day spas</option>
+            <option>Depilação e design de sobrancelhas</option>
+          </optgroup>
+          <optgroup label="Saúde">
+            <option>Clínicas e consultórios médicos</option>
+            <option>Clínicas odontológicas</option>
+            <option>Fisioterapia e pilates</option>
+            <option>Psicologia e terapia</option>
+            <option>Nutricionistas</option>
+            <option>Farmácias e óticas</option>
+            <option>Laboratórios de análises clínicas</option>
+            <option>Fonoaudiologia</option>
+          </optgroup>
+          <optgroup label="Pet">
+            <option>Pet shops e veterinárias</option>
+            <option>Banho e tosa</option>
+            <option>Hotel para pets</option>
+            <option>Adestramento</option>
+          </optgroup>
+          <optgroup label="Automotivo">
+            <option>Oficinas mecânicas</option>
+            <option>Funilaria e pintura</option>
+            <option>Auto elétrica</option>
+            <option>Lava-rápido e estética automotiva</option>
+            <option>Borracharias</option>
+            <option>Concessionárias e revendas de veículos</option>
+            <option>Autopeças</option>
+            <option>Locadoras de veículos</option>
+          </optgroup>
+          <optgroup label="Construção e reforma">
+            <option>Construtoras e empreiteiras</option>
+            <option>Materiais de construção</option>
+            <option>Marcenarias e móveis planejados</option>
+            <option>Elétrica e hidráulica</option>
+            <option>Pintura predial</option>
+            <option>Vidraçarias</option>
+            <option>Serralherias</option>
+            <option>Arquitetura e engenharia</option>
+          </optgroup>
+          <optgroup label="Moda e varejo">
+            <option>Lojas de roupas e calçados</option>
+            <option>Joalherias e relojoarias</option>
+            <option>Papelarias e livrarias</option>
+            <option>Lojas de eletrônicos</option>
+            <option>Lojas de móveis e decoração</option>
+            <option>Brechós e semi-joias</option>
+            <option>Floriculturas</option>
+            <option>Presentes e utilidades</option>
+          </optgroup>
+          <optgroup label="Educação">
+            <option>Escolas de idiomas</option>
+            <option>Cursos preparatórios</option>
+            <option>Escolas de música e artes</option>
+            <option>Creches e escolinhas</option>
+            <option>Autoescolas</option>
+            <option>Reforço escolar particular</option>
+          </optgroup>
+          <optgroup label="Esporte e lazer">
+            <option>Academias e studios de treino</option>
+            <option>Escolas de dança</option>
+            <option>Lutas marciais e boxe</option>
+            <option>Yoga e pilates</option>
+            <option>Quadras e clubes esportivos</option>
+          </optgroup>
+          <optgroup label="Profissionais e serviços">
+            <option>Advocacia</option>
+            <option>Contabilidade</option>
+            <option>Imobiliárias e corretores</option>
+            <option>Consultoria empresarial</option>
+            <option>Agências de marketing</option>
+            <option>Fotografia e filmagem de eventos</option>
+            <option>Despachantes</option>
+            <option>Seguros</option>
+          </optgroup>
+          <optgroup label="Eventos e festas">
+            <option>Buffets e casas de festa</option>
+            <option>Decoração de eventos</option>
+            <option>DJs e som para festas</option>
+            <option>Doces e bolos personalizados</option>
+          </optgroup>
+          <optgroup label="Casa e serviços domésticos">
+            <option>Limpeza residencial e diarista</option>
+            <option>Dedetização</option>
+            <option>Jardinagem e paisagismo</option>
+            <option>Chaveiros</option>
+            <option>Lavanderias</option>
+            <option>Assistência técnica em eletrodomésticos</option>
+          </optgroup>
+          <optgroup label="Tecnologia">
+            <option>Assistência técnica de celulares e informática</option>
+            <option>Desenvolvimento de software</option>
+            <option>Lojas de informática</option>
+          </optgroup>
+          <optgroup label="Turismo e hospedagem">
+            <option>Pousadas e hotéis</option>
+            <option>Agências de viagem</option>
+            <option>Guias e passeios turísticos</option>
+          </optgroup>
+        </select>
+        <input id="filtroCidade" placeholder="Ex: João Pessoa-PB">
+        <button id="filtrarBtn">🔍 Buscar</button>
+      </div>
+      <div class="leads-hint" id="leadsHint">Escolha a região e o ramo, depois clique em Buscar.</div>
+      <div class="leads-lista" id="leadsLista"></div>
+    </div>
+  </div>
+</section>
+
+<div id="leadModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(20,18,16,.55);z-index:1000;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this) fecharLeadModal()">
+  <div id="leadModal" style="background:#fff;border-radius:16px;max-width:460px;width:100%;max-height:88vh;overflow-y:auto;padding:26px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+      <h3 id="leadModalNome" style="font-size:19px;margin:0"></h3>
+      <span onclick="fecharLeadModal()" style="cursor:pointer;font-size:20px;color:var(--ink-soft);line-height:1">✕</span>
+    </div>
+    <div style="font-size:13.5px;color:var(--ink-soft);margin-bottom:6px">📍 <span id="leadModalEndereco"></span></div>
+    <div style="font-size:13.5px;color:var(--ink-soft);margin-bottom:14px">📞 <span id="leadModalTelefone"></span></div>
+
+    <div style="border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--ink-soft)">
+      <div style="font-weight:700;color:var(--ink);margin-bottom:6px">Horário (estimado)</div>
+      <div>Seg: Fechado · Ter–Sex: 10:00–20:00 · Sáb: 9:00–18:00 · Dom: Fechado</div>
+    </div>
+
+    <div style="font-size:11.5px;font-weight:800;color:var(--red);letter-spacing:.03em;margin-bottom:8px">EXTRAS DE IA</div>
+    <label style="display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;cursor:pointer">
+      <input type="checkbox" id="extraFotos" checked style="margin-top:3px">
+      <span style="font-size:13px"><b>Incluir fotos do comércio</b> <span style="color:var(--red);font-weight:700">(+2 créditos)</span><br><span style="color:var(--ink-soft);font-size:12px">Usa fotos reais no topo e na galeria. Sem isso o site sai só com texto.</span></span>
+    </label>
+    <label style="display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:18px;cursor:pointer">
+      <input type="checkbox" id="extraOpus" checked style="margin-top:3px">
+      <span style="font-size:13px"><b>Usar Opus 5</b> <span style="color:var(--red);font-weight:700">(+2 créditos)</span><br><span style="color:var(--ink-soft);font-size:12px">Geração aprimorada, com depoimento e diferenciais mais elaborados.</span></span>
+    </label>
+
+    <div style="display:flex;gap:10px">
+      <button id="leadModalLigar" onclick="ligarLead()" style="flex:1;padding:12px;border:1px solid var(--line);background:#fff;border-radius:22px;font-weight:700;font-size:13.5px;cursor:pointer">📞 Ligar</button>
+      <button id="leadModalCriar" onclick="criarSiteDoLead()" style="flex:1.4;padding:12px;border:none;background:var(--red);color:#fff;border-radius:22px;font-weight:700;font-size:13.5px;cursor:pointer">Criar site (<span id="leadModalCusto">8</span> créditos)</button>
+    </div>
+  </div>
+</div>
+
+<section id="sec-gerador">
+  <div class="gwrap">
+    <div class="gheader">
+      <div>
+        <h2 style="font-size:26px">Gerador de sites</h2>
+        <p>Preencha os dados do prospect. O texto sai pronto via IA e as fotos vêm de banco real, no ramo do negócio.</p>
+      </div>
+      <div class="dash">
+        <div class="dash-card"><b id="dashCreditos">1.000.000</b><span>créditos</span></div>
+        <div class="dash-card"><b id="dashGerados">0</b><span>sites gerados</span></div>
+        <div class="dash-card"><b id="dashLeads">0</b><span>leads na sessão</span></div>
+      </div>
+    </div>
+
+    <div class="ggrid">
+      <div class="gpanel">
+        <div class="gfield"><label>Nome da empresa</label><input id="nome" placeholder="Padaria Bom Pão"></div>
+        <div class="gfield"><label>Ramo / setor</label><input id="ramo" placeholder="padaria, clínica odontológica..."></div>
+        <div class="gfield"><label>Cidade</label><input id="cidade" placeholder="Fortaleza, CE"></div>
+        <div class="gfield"><label>Diferenciais (opcional)</label><textarea id="obs" rows="3" placeholder="20 anos de mercado..."></textarea></div>
+        <div class="gfield">
+          <label>Cor principal</label>
+          <div class="swatches" id="swatches"></div>
+        </div>
+        <div class="toggle-row">
+          <input type="checkbox" id="animado" checked>
+          <label for="animado" style="margin:0">Site com animações de entrada</label>
+        </div>
+        <div class="toggle-row">
+          <input type="checkbox" id="opus5">
+          <label for="opus5" style="margin:0">Habilitar Opus 5 (geração aprimorada)</label>
+        </div>
+        <button class="gprimary" id="gerarBtn">Gerar site (10 créditos)</button>
+        <div class="gstatus" id="status"></div>
+        <div class="gerr" id="errBox"></div>
+      </div>
+
+      <div class="preview-panel">
+        <div class="preview-empty" id="previewEmpty"><span class="icon">🌐</span><b>Nenhum site gerado ainda</b><span>Preencha o formulário ao lado e clique em "Gerar site" para ver a prévia aqui.</span></div>
+        <div id="preview"></div>
+        <div class="toolbar" id="toolbar" style="display:none">
+          <button id="downloadBtn">Baixar HTML</button>
+          <button id="regenBtn">Gerar novamente</button>
+        </div>
+        <div id="precoSugestao" style="display:none;padding:14px 34px;border-top:1px solid var(--line);background:var(--pink-bg)">
+          <div style="font-size:12px;color:var(--ink-soft);font-weight:700">SUGESTÃO DE VENDA</div>
+          <div style="font-size:22px;font-weight:800;color:var(--red)" id="precoValor"></div>
+          <div style="font-size:12px;color:var(--ink-soft)" id="precoFaixa"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sec-faturamento" style="background:var(--pink-bg)">
+  <div class="gwrap">
+    <h2 style="font-size:26px;margin-bottom:6px">Faturamento</h2>
+    <p style="color:var(--ink-soft);font-size:14px;margin-bottom:24px">Registre as vendas que você já fechou usando os sites gerados. Fica salvo só nesta sessão do navegador.</p>
+
+    <div class="ggrid">
+      <div class="gpanel">
+        <div class="gfield"><label>Cliente / comércio</label><input id="fatCliente" placeholder="Padaria Bela Sagres"></div>
+        <div class="gfield"><label>Valor da venda (R$)</label><input id="fatValor" type="number" min="0" step="0.01" placeholder="400"></div>
+        <button class="gprimary" id="fatAddBtn">+ Adicionar venda</button>
+      </div>
+      <div class="preview-panel" style="min-height:auto">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:12px;color:var(--ink-soft)">Total faturado</div>
+            <div style="font-size:28px;font-weight:800;color:var(--red)" id="fatTotal">R$ 0,00</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:var(--ink-soft)">Vendas registradas</div>
+            <div style="font-size:20px;font-weight:700" id="fatCount">0</div>
+          </div>
+        </div>
+        <div id="fatLista" style="padding:8px 0"></div>
+        <div id="fatEmpty" style="padding:30px 24px;text-align:center;color:var(--ink-soft);font-size:13.5px">Nenhuma venda registrada ainda.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+const cores = ["#C8952E","#8FA895","#B5563A","#C9A227","#7A8FA6"];
+let corSelecionada = cores[0];
+const sw = document.getElementById('swatches');
+cores.forEach((c,i)=>{
+  const d = document.createElement('div');
+  d.className = 'swatch'+(i===0?' active':'');
+  d.style.background = c;
+  d.addEventListener('click',()=>{
+    corSelecionada = c;
+    [...sw.children].forEach(x=>x.classList.remove('active'));
+    d.classList.add('active');
+  });
+  sw.appendChild(d);
+});
+
+let siteHtmlFinal = "";
+let sitesGerados = 0;
+let creditos = 1000000;
+const CUSTO_GERACAO = 10;
+
+const PEXELS_KEY = "FfYBk2waLs0fYhJUnH12MW7pUV7zsJFadvAiKzRHLYQvKkxDtrlarLZP";
+async function buscarFotosPexels(query, quantidade){
+  try{
+    const resp = await fetch(`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=${quantidade}`, {
+      headers: { Authorization: PEXELS_KEY }
+    });
+    if(!resp.ok){
+      throw new Error("Pexels respondeu status " + resp.status);
+    }
+    const data = await resp.json();
+    const urls = (data.photos||[]).map(p => p.src.large2x || p.src.large).filter(Boolean);
+    if(urls.length === 0){
+      throw new Error("Pexels não retornou fotos para esse termo");
+    }
+    while(urls.length < quantidade){
+      urls.push(urls[urls.length % (data.photos||[]).length] || urls[0]);
+    }
+    console.log("Fotos Pexels OK:", urls);
+    return urls;
+  }catch(e){
+    console.error("Falha na Pexels, usando Picsum como reserva:", e.message);
+    const fallback = [];
+    for(let i=0;i<quantidade;i++){
+      fallback.push(`https://picsum.photos/seed/${encodeURIComponent(query)}${i}/800/600`);
+    }
+    return fallback;
+  }
+}
+
+function irParaLeads(){
+  document.getElementById('sec-leads').scrollIntoView({behavior:'smooth'});
+}
+
+const nomesPorCategoria = {
+  "Restaurantes, padarias e lanchonetes":["Padaria Bela Sagres","Suifong Bakery","Lanchonete do Zé"],
+  "Bares e casas noturnas":["Bar do Chico","Choperia Vista Alegre"],
+  "Cafeterias e confeitarias":["Café Aromas","Confeitaria Doce Lar"],
+  "Pizzarias e hamburguerias":["Pizzaria Forno a Lenha","Burger Station"],
+  "Food trucks":["Food Truck Sabor na Rua"],
+  "Açougues e peixarias":["Açougue Boi Bom","Peixaria Maré Alta"],
+  "Hortifruti e mercearias":["Hortifruti Vida Verde","Mercearia São José"],
+  "Sorveterias e açaiterias":["Sorveteria Gelato Puro","Açaí do Ponto"],
+  "Distribuidoras de bebidas":["Distribuidora Bebidas Central"],
+  "Salões de beleza e manicure":["Espaço Beleza Pura","Studio Hair Elegance"],
+  "Barbearias":["Barbearia Navalha de Ouro","Barbearia do Formiga"],
+  "Clínicas de estética e massagem":["Clínica Renove Estética","Espaço Zen Massoterapia"],
+  "Tatuagem e piercing":["Ink Studio Tattoo","Black Line Piercing"],
+  "Spas e day spas":["Spa Águas Claras"],
+  "Depilação e design de sobrancelhas":["Studio Sobrancelha Perfeita"],
+  "Clínicas e consultórios médicos":["Clínica São Lucas"],
+  "Clínicas odontológicas":["Rede Odonto"],
+  "Fisioterapia e pilates":["Clínica FisioAtiva"],
+  "Psicologia e terapia":["Espaço Psicologia Viva"],
+  "Nutricionistas":["Consultório Nutrir Bem"],
+  "Farmácias e óticas":["Farmácia Popular Vida","Ótica Bela Vista"],
+  "Laboratórios de análises clínicas":["Laboratório VidaExame"],
+  "Fonoaudiologia":["Clínica FalaBem"],
+  "Pet shops e veterinárias":["Pet Center Amigo Fiel","Clínica Veterinária VidaPet"],
+  "Banho e tosa":["Banho e Tosa PetLimpo"],
+  "Hotel para pets":["Hotel Pet Feliz"],
+  "Adestramento":["Adestra Pet"],
+  "Oficinas mecânicas":["Oficina Motor Forte"],
+  "Funilaria e pintura":["Funilaria Novo Brilho"],
+  "Auto elétrica":["Auto Elétrica Central"],
+  "Lava-rápido e estética automotiva":["Lava Rápido Brilho Total"],
+  "Borracharias":["Borracharia São Cristóvão"],
+  "Concessionárias e revendas de veículos":["Revenda AutoBom"],
+  "Autopeças":["Autopeças Rápido Motor"],
+  "Locadoras de veículos":["Locadora Rota Livre"],
+  "Construtoras e empreiteiras":["Construtora Alicerce Forte"],
+  "Materiais de construção":["Materiais Construir Bem"],
+  "Marcenarias e móveis planejados":["Marcenaria MadeiraViva"],
+  "Elétrica e hidráulica":["Elétrica e Hidráulica JR"],
+  "Pintura predial":["Pintura Predial NovaCor"],
+  "Vidraçarias":["Vidraçaria Cristal"],
+  "Serralherias":["Serralheria Ferro Forte"],
+  "Arquitetura e engenharia":["Estúdio Arquitetura Linha"],
+  "Lojas de roupas e calçados":["Loja Estilo Urbano"],
+  "Joalherias e relojoarias":["Joalheria Ouro Fino"],
+  "Papelarias e livrarias":["Papelaria Folha Nova"],
+  "Lojas de eletrônicos":["EletroCenter"],
+  "Lojas de móveis e decoração":["Casa & Estilo Móveis"],
+  "Brechós e semi-joias":["Brechó Retrô"],
+  "Floriculturas":["Floricultura Flor de Lis"],
+  "Presentes e utilidades":["Loja Presente Único"],
+  "Escolas de idiomas":["Escola de Idiomas FalaFácil"],
+  "Cursos preparatórios":["Cursinho Aprova+"],
+  "Escolas de música e artes":["Escola de Música HarmoniArte"],
+  "Creches e escolinhas":["Creche Cantinho Feliz"],
+  "Autoescolas":["Autoescola Direção Segura"],
+  "Reforço escolar particular":["Reforço Escolar Saber Mais"],
+  "Academias e studios de treino":["Academia Corpo Ativo"],
+  "Escolas de dança":["Studio de Dança Movimento"],
+  "Lutas marciais e boxe":["Academia de Luta Divisão"],
+  "Yoga e pilates":["Estúdio Yoga Flow"],
+  "Quadras e clubes esportivos":["Clube Arena Esportiva"],
+  "Advocacia":["Escritório de Advocacia Justiça & Lei"],
+  "Contabilidade":["Contabilidade Exata Assessoria"],
+  "Imobiliárias e corretores":["Imobiliária Casa Nova"],
+  "Consultoria empresarial":["Consultoria Rumo Certo"],
+  "Agências de marketing":["Agência Marketing Alcance"],
+  "Fotografia e filmagem de eventos":["Estúdio Foto & Filme"],
+  "Despachantes":["Despachante Documenta Já"],
+  "Seguros":["Corretora de Seguros Proteger"],
+  "Buffets e casas de festa":["Buffet Festa & Cia"],
+  "Decoração de eventos":["Decoração Momento Especial"],
+  "DJs e som para festas":["DJ Som na Festa"],
+  "Doces e bolos personalizados":["Doceria Arte em Açúcar"],
+  "Limpeza residencial e diarista":["Serviços de Limpeza CasaLimpa"],
+  "Dedetização":["Dedetizadora Livre de Pragas"],
+  "Jardinagem e paisagismo":["Paisagismo Jardim Vivo"],
+  "Chaveiros":["Chaveiro 24h Abre Fácil"],
+  "Lavanderias":["Lavanderia Roupa Limpa"],
+  "Assistência técnica em eletrodomésticos":["Assistência Técnica ConsertaTudo"],
+  "Assistência técnica de celulares e informática":["Assistência TeleFix"],
+  "Desenvolvimento de software":["Estúdio de Software CodeUp"],
+  "Lojas de informática":["Loja InfoTech"],
+  "Pousadas e hotéis":["Pousada Recanto Tranquilo"],
+  "Agências de viagem":["Agência de Viagens Destino Certo"],
+  "Guias e passeios turísticos":["Guia Turístico Rota Local"]
+};
+const osmTagPorCategoria = {
+  "Restaurantes, padarias e lanchonetes":['amenity=restaurant','amenity=fast_food','shop=bakery'],
+  "Bares e casas noturnas":['amenity=bar','amenity=pub','amenity=nightclub'],
+  "Cafeterias e confeitarias":['amenity=cafe','shop=confectionery'],
+  "Pizzarias e hamburguerias":['amenity=fast_food'],
+  "Food trucks":['amenity=fast_food'],
+  "Açougues e peixarias":['shop=butcher','shop=seafood'],
+  "Hortifruti e mercearias":['shop=greengrocer','shop=convenience'],
+  "Sorveterias e açaiterias":['amenity=ice_cream'],
+  "Distribuidoras de bebidas":['shop=beverages'],
+  "Salões de beleza e manicure":['shop=hairdresser','shop=beauty'],
+  "Barbearias":['shop=hairdresser'],
+  "Clínicas de estética e massagem":['shop=beauty','amenity=spa'],
+  "Tatuagem e piercing":['shop=tattoo'],
+  "Spas e day spas":['amenity=spa'],
+  "Depilação e design de sobrancelhas":['shop=beauty'],
+  "Clínicas e consultórios médicos":['amenity=clinic','amenity=doctors'],
+  "Clínicas odontológicas":['amenity=dentist'],
+  "Fisioterapia e pilates":['healthcare=physiotherapist'],
+  "Psicologia e terapia":['healthcare=psychotherapist'],
+  "Nutricionistas":['healthcare=nutritionist'],
+  "Farmácias e óticas":['amenity=pharmacy','shop=optician'],
+  "Laboratórios de análises clínicas":['healthcare=laboratory'],
+  "Pet shops e veterinárias":['shop=pet','amenity=veterinary'],
+  "Oficinas mecânicas":['shop=car_repair'],
+  "Auto elétrica":['shop=car_repair'],
+  "Lava-rápido e estética automotiva":['shop=car_wash'],
+  "Borracharias":['shop=tyres'],
+  "Concessionárias e revendas de veículos":['shop=car'],
+  "Autopeças":['shop=car_parts'],
+  "Materiais de construção":['shop=doityourself','shop=hardware'],
+  "Lojas de roupas e calçados":['shop=clothes','shop=shoes'],
+  "Joalherias e relojoarias":['shop=jewelry'],
+  "Papelarias e livrarias":['shop=stationery','shop=books'],
+  "Lojas de eletrônicos":['shop=electronics'],
+  "Lojas de móveis e decoração":['shop=furniture'],
+  "Floriculturas":['shop=florist'],
+  "Academias e studios de treino":['leisure=fitness_centre'],
+  "Escolas de dança":['leisure=dance'],
+  "Advocacia":['office=lawyer'],
+  "Contabilidade":['office=accountant'],
+  "Imobiliárias e corretores":['office=estate_agent'],
+  "Pousadas e hotéis":['tourism=hotel','tourism=guest_house'],
+  "Agências de viagem":['office=travel_agent'],
+  "Fonoaudiologia":['healthcare=speech_therapist','amenity=clinic'],
+  "Banho e tosa":['shop=pet_grooming','shop=pet'],
+  "Hotel para pets":['shop=pet'],
+  "Adestramento":['shop=pet'],
+  "Funilaria e pintura":['shop=car_repair'],
+  "Locadoras de veículos":['amenity=car_rental'],
+  "Construtoras e empreiteiras":['office=construction_company','craft=builder'],
+  "Marcenarias e móveis planejados":['craft=carpenter','shop=furniture'],
+  "Elétrica e hidráulica":['craft=electrician','craft=plumber'],
+  "Pintura predial":['craft=painter'],
+  "Vidraçarias":['shop=glaziery','craft=glaziery'],
+  "Serralherias":['craft=metal_construction'],
+  "Arquitetura e engenharia":['office=architect'],
+  "Brechós e semi-joias":['shop=second_hand','shop=jewelry'],
+  "Presentes e utilidades":['shop=gift','shop=variety_store'],
+  "Escolas de idiomas":['office=educational_institution','amenity=language_school'],
+  "Cursos preparatórios":['amenity=driving_school','office=educational_institution'],
+  "Escolas de música e artes":['amenity=music_school'],
+  "Creches e escolinhas":['amenity=kindergarten'],
+  "Autoescolas":['amenity=driving_school'],
+  "Reforço escolar particular":['office=educational_institution'],
+  "Lutas marciais e boxe":['sport=martial_arts','leisure=fitness_centre'],
+  "Yoga e pilates":['sport=yoga','sport=pilates'],
+  "Quadras e clubes esportivos":['leisure=sports_centre'],
+  "Consultoria empresarial":['office=consulting'],
+  "Agências de marketing":['office=advertising_agency'],
+  "Fotografia e filmagem de eventos":['shop=photo','craft=photographer'],
+  "Despachantes":['office=administrative'],
+  "Seguros":['office=insurance'],
+  "Buffets e casas de festa":['amenity=events_venue'],
+  "Decoração de eventos":['shop=gift'],
+  "DJs e som para festas":['shop=music'],
+  "Doces e bolos personalizados":['shop=confectionery','shop=bakery'],
+  "Limpeza residencial e diarista":['office=cleaning'],
+  "Dedetização":['craft=pest_control'],
+  "Jardinagem e paisagismo":['craft=gardener','shop=garden_centre'],
+  "Chaveiros":['shop=locksmith','craft=locksmith'],
+  "Lavanderias":['shop=laundry'],
+  "Assistência técnica em eletrodomésticos":['craft=electronics_repair','shop=electronics'],
+  "Assistência técnica de celulares e informática":['shop=mobile_phone','craft=electronics_repair'],
+  "Desenvolvimento de software":['office=it'],
+  "Lojas de informática":['shop=computer'],
+  "Guias e passeios turísticos":['office=travel_agent']
+};
+
+async function geocodificarCidade(cidade){
+  let resp;
+  try{
+    resp = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(cidade)}&limit=1`);
+  }catch(e){
+    throw new Error("Falha de rede ao geocodificar cidade (Photon): " + e.message);
+  }
+  if(!resp.ok) throw new Error("Photon respondeu status " + resp.status);
+  const data = await resp.json();
+  const feat = data && data.features && data.features[0];
+  if(!feat) throw new Error("Cidade não encontrada");
+  const [lon, lat] = feat.geometry.coordinates;
+  return { lat, lon };
+}
+
+const OVERPASS_MIRRORS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://lz4.overpass-api.de/api/interpreter",
+  "https://z.overpass-api.de/api/interpreter"
+];
+
+async function buscarLeadsReais(categoria, cidade){
+  const { lat, lon } = await geocodificarCidade(cidade);
+  const tags = osmTagPorCategoria[categoria] || ['shop'];
+  const filtros = tags.map(t=>{
+    const [k,v] = t.split('=');
+    return `node["${k}"="${v}"](around:8000,${lat},${lon});`;
+  }).join("");
+  const query = `[out:json][timeout:20];(${filtros});out center 20;`;
+
+  let resp = null;
+  const todosErros = [];
+  for(const mirror of OVERPASS_MIRRORS){
+    try{
+      const r = await fetch(mirror + "?data=" + encodeURIComponent(query));
+      if(r.ok){ resp = r; break; }
+      todosErros.push(mirror + " → status " + r.status);
+    }catch(e){
+      todosErros.push(mirror + " → " + e.message);
+    }
+  }
+  if(!resp) throw new Error("Todos os servidores falharam: " + todosErros.join(" | "));
+
+  const data = await resp.json();
+  return (data.elements||[])
+    .filter(el => el.tags && el.tags.name && !el.tags.website)
+    .slice(0, 12)
+    .map(el => ({
+      nome: el.tags.name,
+      endereco: [el.tags['addr:street'], el.tags['addr:housenumber']].filter(Boolean).join(', ') || "Endereço não informado no OSM",
+      telefone: el.tags.phone || el.tags['contact:phone'] || null
+    }));
+}
+
+document.getElementById('filtrarBtn').addEventListener('click', filtrarLeads);
+function montarBotaoWhatsapp(telefone, nome){
+  if(!telefone){
+    return `<span style="display:block;font-size:11.5px;color:var(--ink-soft);margin-top:6px">Telefone não informado no OSM</span>`;
+  }
+  const digitos = telefone.replace(/\D/g,'');
+  const numeroWa = digitos.startsWith('55') ? digitos : '55' + digitos;
+  const msg = encodeURIComponent(`Olá! Vi que a ${nome} ainda não tem site e fiz um exemplo pra vocês. Posso te mostrar?`);
+  return `<a href="https://wa.me/${numeroWa}?text=${msg}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:inline-block;margin-top:6px;font-size:12px;color:#1a7d3a;font-weight:700;text-decoration:none">📱 ${telefone} — mandar mensagem</a>`;
+}
+
+function fecharDrawerEIr(id){
+  document.getElementById('navDrawer').classList.remove('open');
+  document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+
+let vendas = [];
+document.getElementById('fatAddBtn').addEventListener('click', ()=>{
+  const cliente = document.getElementById('fatCliente').value.trim();
+  const valor = parseFloat(document.getElementById('fatValor').value);
+  if(!cliente || !valor || valor <= 0) return;
+  vendas.push({ cliente, valor, data: new Date() });
+  document.getElementById('fatCliente').value = '';
+  document.getElementById('fatValor').value = '';
+  renderizarFaturamento();
+});
+function renderizarFaturamento(){
+  const lista = document.getElementById('fatLista');
+  const empty = document.getElementById('fatEmpty');
+  const total = vendas.reduce((s,v)=>s+v.valor,0);
+  document.getElementById('fatTotal').textContent = 'R$ ' + total.toLocaleString('pt-BR',{minimumFractionDigits:2});
+  document.getElementById('fatCount').textContent = vendas.length;
+  if(vendas.length === 0){
+    lista.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  lista.innerHTML = vendas.slice().reverse().map((v,i)=>{
+    const idx = vendas.length - 1 - i;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 24px;border-bottom:1px solid var(--line);font-size:13.5px">
+      <div><b>${v.cliente}</b><div style="font-size:11.5px;color:var(--ink-soft)">${v.data.toLocaleDateString('pt-BR')}</div></div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-weight:700;color:var(--red)">R$ ${v.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</span>
+        <span onclick="removerVenda(${idx})" style="cursor:pointer;color:var(--ink-soft);font-size:15px">✕</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+function removerVenda(idx){
+  vendas.splice(idx,1);
+  renderizarFaturamento();
+}
+
+let leadAtual = null;
+
+function abrirLeadModal(lead){
+  leadAtual = lead;
+  document.getElementById('leadModalNome').textContent = lead.nome;
+  document.getElementById('leadModalEndereco').textContent = `${lead.endereco} - ${lead.cidade}`;
+  document.getElementById('leadModalTelefone').textContent = lead.telefone || "Não informado";
+  document.getElementById('leadModalLigar').style.opacity = lead.telefone ? '1' : '.5';
+  document.getElementById('extraFotos').checked = true;
+  document.getElementById('extraOpus').checked = true;
+  atualizarCustoModal();
+  document.getElementById('leadModalOverlay').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function fecharLeadModal(){
+  document.getElementById('leadModalOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape') fecharLeadModal();
+});
+function atualizarCustoModal(){
+  let custo = 4;
+  if(document.getElementById('extraFotos').checked) custo += 2;
+  if(document.getElementById('extraOpus').checked) custo += 2;
+  document.getElementById('leadModalCusto').textContent = custo;
+}
+document.getElementById('extraFotos').addEventListener('change', atualizarCustoModal);
+document.getElementById('extraOpus').addEventListener('change', atualizarCustoModal);
+
+function ligarLead(){
+  if(!leadAtual || !leadAtual.telefone) return;
+  window.location.href = `tel:${leadAtual.telefone.replace(/\D/g,'')}`;
+}
+
+function criarSiteDoLead(){
+  if(!leadAtual) return;
+  document.getElementById('nome').value = leadAtual.nome;
+  document.getElementById('ramo').value = leadAtual.categoria;
+  document.getElementById('cidade').value = leadAtual.cidade;
+  fecharLeadModal();
+  document.getElementById('sec-gerador').scrollIntoView({behavior:'smooth'});
+}
+
+function fotoLeadUrl(categoria){
+  return `https://picsum.photos/seed/${encodeURIComponent(categoria)}${Math.floor(Math.random()*9999)}/400/240`;
+}
+
+async function filtrarLeads(){
+  const cat = document.getElementById('filtroCategoria').value;
+  const cidade = document.getElementById('filtroCidade').value.trim();
+  const hint = document.getElementById('leadsHint');
+  const lista = document.getElementById('leadsLista');
+  if(!cidade){ hint.textContent = "Digite uma cidade para buscar."; return; }
+  hint.textContent = "Buscando dados reais no OpenStreetMap...";
+  lista.innerHTML = "";
+  try{
+    const leads = await buscarLeadsReais(cat, cidade);
+    if(leads.length === 0){
+      hint.textContent = `Nenhum "${cat}" sem site cadastrado no OpenStreetMap para ${cidade}. Tente outra cidade ou categoria — a cobertura do OSM varia por região.`;
+      return;
+    }
+    const fotos = await buscarFotosPexels(cat, leads.length);
+    leads.forEach((l,idx)=>{
+      const div = document.createElement('div');
+      div.className = 'lead-card';
+      const img = fotos[idx] || fotoLeadUrl(cat);
+      div.innerHTML = `<img src="${img}" alt="${cat}" onerror="this.onerror=null;this.src='${fotoLeadUrl(cat)}'"><div class="lead-body"><b>${l.nome}</b><span>${l.endereco} - ${cidade}</span><span class="gerarLink">Ver detalhes e gerar site →</span></div>`;
+      div.addEventListener('click', ()=> abrirLeadModal({nome:l.nome, endereco:l.endereco, telefone:l.telefone, categoria:cat, cidade}));
+      lista.appendChild(div);
+    });
+    hint.textContent = `${leads.length} comércios reais encontrados em ${cidade} (dados OpenStreetMap, sem site cadastrado).`;
+  }catch(e){
+    console.error(e);
+    renderizarLeadsExemplo(cat, cidade, lista, hint, e.message);
+  }
+}
+
+function renderizarLeadsExemplo(cat, cidade, lista, hint, motivoErro){
+  const base = nomesPorCategoria[cat] || ["Comércio Local"];
+  const ruas = ["R. dos Tamoios, 666","R. Conselheiro Carrão, 178","R. da Consolação, 49","R. da Glória, 140","Av. Central, 320"];
+  lista.innerHTML = "";
+  base.forEach((n,idx)=>{
+    const div = document.createElement('div');
+    div.className = 'lead-card';
+    const img = fotoLeadUrl(cat);
+    div.innerHTML = `<img src="${img}" alt="${cat}"><div class="lead-body"><b>${n}</b><span>${ruas[idx%ruas.length]} - ${cidade}</span><span class="gerarLink">Ver detalhes e gerar site →</span></div>`;
+    div.addEventListener('click', ()=> abrirLeadModal({nome:n, endereco:ruas[idx%ruas.length], telefone:null, categoria:cat, cidade}));
+    lista.appendChild(div);
+  });
+  hint.innerHTML = `⚠️ Não consegui acessar a busca real agora. Motivo técnico: <code>${motivoErro || 'desconhecido'}</code>. Mostrando <b>dados de exemplo</b> enquanto isso.`;
+}
+
+function preencherBusca(cidade){
+  document.getElementById('buscaCidade').value = cidade;
+  buscar();
+}
+document.getElementById('buscarBtn').addEventListener('click', buscar);
+function buscar(){
+  const cidade = document.getElementById('buscaCidade').value.trim();
+  const res = document.getElementById('buscaResultado');
+  if(!cidade){ res.textContent = "Digite uma cidade para ver a estimativa."; return; }
+  const estimativa = 40 + Math.floor(Math.random()*260);
+  res.innerHTML = `Estimativa: <b style="color:var(--red)">${estimativa} comércios</b> em ${cidade} ainda sem site. <span style="color:var(--red);cursor:pointer;font-weight:600" onclick="document.getElementById('cidade').value='${cidade}';document.getElementById('sec-gerador').scrollIntoView({behavior:'smooth'})">Gerar um site agora →</span>`;
+}
+
+document.getElementById('gerarBtn').addEventListener('click', gerar);
+document.getElementById('regenBtn').addEventListener('click', gerar);
+document.getElementById('downloadBtn').addEventListener('click', baixar);
+
+async function gerar(){
+  const errBox = document.getElementById('errBox');
+  errBox.textContent = "";
+  if(creditos < CUSTO_GERACAO){
+    errBox.textContent = "Créditos insuficientes.";
+    return;
+  }
+  const nome = document.getElementById('nome').value.trim();
+  const ramo = document.getElementById('ramo').value.trim();
+  const cidade = document.getElementById('cidade').value.trim();
+  const obs = document.getElementById('obs').value.trim();
+
+  if(!nome || !ramo){
+    errBox.textContent = "Preencha ao menos nome e ramo da empresa.";
+    return;
+  }
+
+  const btn = document.getElementById('gerarBtn');
+  const status = document.getElementById('status');
+  btn.disabled = true;
+  status.textContent = "Escrevendo o conteúdo do site...";
+  document.getElementById('previewEmpty').style.display = 'none';
+
+  try{
+    const prompt = `Gere conteúdo para o site institucional de alto padrão de uma empresa. Responda APENAS em JSON válido, sem markdown, sem texto extra, no formato:
+{"headline":"...","headlineDestaque":"...","subheadline":"...","sobre":"...","servicos":["...","...","..."],"cta":"...","navLinks":["...","...","..."],"feats":["...","...","...","..."],"depoimento":"...","depoimentoAutor":"..."}
+Empresa: ${nome}
+Ramo: ${ramo}
+Cidade: ${cidade || "não informado"}
+Observações: ${obs || "nenhuma"}
+"headline" é a primeira linha do hero (até 5 palavras). "headlineDestaque" é a segunda linha, em destaque (até 5 palavras). Sem clichês genéricos. "subheadline" até 18 palavras. "sobre" com 2-3 frases curtas e persuasivas. "servicos" com exatamente 3 itens curtos (até 5 palavras cada). "cta" texto de botão de até 4 palavras. "navLinks" 3 itens curtos de menu. "feats" exatamente 4 diferenciais curtos (2-3 palavras). "depoimento" frase curta e realista de cliente satisfeito (até 22 palavras), "depoimentoAutor" nome fictício com cidade. Português do Brasil, tom sofisticado e direto.`;
+
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        messages: [{role:"user", content: prompt}]
+      })
+    });
+    const data = await resp.json();
+    let text = data.content.filter(c=>c.type==="text").map(c=>c.text).join("").trim();
+    text = text.replace(/```json|```/g,"").trim();
+    const copy = JSON.parse(text);
+
+    status.textContent = "Buscando fotos reais (Pexels)...";
+    const termoFoto = cidade ? `${ramo} ${cidade}` : ramo;
+    const fotos = await buscarFotosPexels(termoFoto, 4);
+    const heroImg = fotos[0];
+    const gal1 = fotos[1];
+    const gal2 = fotos[2];
+    const gal3 = fotos[3];
+    const animado = document.getElementById('animado').checked;
+
+    siteHtmlFinal = montarSite(nome, corSelecionada, copy, heroImg, ramo, [gal1,gal2,gal3], animado);
+    document.getElementById('preview').innerHTML = siteHtmlFinal;
+    document.getElementById('toolbar').style.display = 'flex';
+    mostrarSugestaoPreco(ramo);
+    sitesGerados++;
+    creditos -= CUSTO_GERACAO;
+    document.getElementById('dashGerados').textContent = sitesGerados;
+    document.getElementById('dashLeads').textContent = sitesGerados;
+    document.getElementById('dashCreditos').textContent = creditos.toLocaleString('pt-BR');
+    status.textContent = "Site gerado. -10 créditos.";
+  }catch(e){
+    console.error(e);
+    errBox.textContent = "Erro ao gerar o site. Tente novamente.";
+    status.textContent = "";
+    document.getElementById('previewEmpty').style.display = 'flex';
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function mostrarSugestaoPreco(ramo){
+  const r = ramo.toLowerCase();
+  let min = 300, max = 600;
+  const premium = ['clínica','advocacia','imobiliária','imoveis','odontológica','odontologia','arquitetura','consultoria','médic'];
+  const media = ['restaurante','academia','pet','salão','barbearia','oficina'];
+  if(premium.some(p=>r.includes(p))){ min=700; max=1500; }
+  else if(media.some(p=>r.includes(p))){ min=450; max=900; }
+  const sugestao = Math.round((min+max)/2/10)*10;
+  document.getElementById('precoSugestao').style.display = 'block';
+  document.getElementById('precoValor').textContent = 'R$ '+sugestao;
+  document.getElementById('precoFaixa').textContent = `Faixa de mercado: R$ ${min} a R$ ${max}`;
+}
+
+function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado){
+  const servicosHtml = copy.servicos.map(s=>`<div class="servico">${s}</div>`).join("");
+  const navHtml = (copy.navLinks||["Início","Serviços","Contato"]).map((l,i)=>`<span onclick="document.getElementById('gsec${i}').scrollIntoView({behavior:'smooth'})">${l}</span>`).join("");
+  const featsHtml = (copy.feats||[]).map(f=>`<span>${f}</span>`).join("");
+  const galHtml = (galeria||[]).map(g=>`<img src="${g}" alt="${ramo}" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${encodeURIComponent(ramo)}fallback/800/600'">`).join("");
+  return `
+    <div class="${animado?'anim-on':''}">
+    <div class="site-hero" id="gsec0" style="--gold:${cor}">
+      <img src="${heroImg}" alt="${ramo}" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${encodeURIComponent(ramo)}hero/1200/600'">
+      <div class="overlay">
+        <div class="site-nav">
+          <div class="brandname">${nome.toUpperCase()}</div>
+          <div class="links">${navHtml}</div>
+          <div class="cta-pill" onclick="document.getElementById('gsec2').scrollIntoView({behavior:'smooth'})">Fale conosco</div>
+        </div>
+        <div class="site-hero-body">
+          <h2>${copy.headline}<br><em>${copy.headlineDestaque||""}</em></h2>
+          <p>${copy.subheadline}</p>
+          <button style="background:${cor}">${copy.cta}</button>
+        </div>
+        <div class="site-feats">${featsHtml}</div>
+      </div>
+    </div>
+    <div class="site-section">
+      <h3>Sobre ${nome}</h3>
+      <p>${copy.sobre}</p>
+    </div>
+    <div class="site-section" id="gsec1">
+      <h3>Serviços</h3>
+      <div class="servicos">${servicosHtml}</div>
+      <div class="galeria">${galHtml}</div>
+    </div>
+    <div class="depoimento">
+      <p>"${copy.depoimento||''}"</p>
+      <span>${copy.depoimentoAutor||''}</span>
+    </div>
+    <div class="site-contato" id="gsec2">
+      <div>
+        <h3 style="font-size:18px;margin-bottom:6px">Vamos conversar?</h3>
+        <p style="font-size:13px;color:var(--ink-soft);margin:0">${ramo} em ${nome}</p>
+      </div>
+      <button class="cta-final" style="background:${cor}">${copy.cta}</button>
+    </div>
+    <div class="site-footer">
+      <span>${nome}</span>
+      <span>Todos os direitos reservados</span>
+    </div>
+    </div>
+  `;
+}
+
+function baixar(){
+  const full = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${document.getElementById('nome').value}</title></head><body style="margin:0;font-family:sans-serif">${siteHtmlFinal}</body></html>`;
+  const blob = new Blob([full], {type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "site-gerado.html";
+  a.click();
+}
+</script>
+
+</body>
+</html>
