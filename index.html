@@ -133,6 +133,8 @@
   .gstatus{font-size:12.5px;color:var(--ink-soft);margin-top:10px;min-height:16px}
   .gerr{color:var(--red);font-size:12.5px;margin-top:8px}
   .preview-panel{border:1px solid var(--line);background:#fff;min-height:460px;display:flex;flex-direction:column;border-radius:16px;overflow:hidden}
+  .preview-panel:has(#preview:not(:empty)){min-height:85vh}
+  #preview{max-height:85vh;overflow-y:auto}
   .preview-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-soft);font-size:13.5px;padding:40px;text-align:center;gap:10px}
   .preview-empty .icon{font-size:38px;opacity:.35}
   .preview-empty b{color:var(--ink);font-size:14.5px;font-weight:700}
@@ -182,6 +184,7 @@
   .site-footer{padding:24px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
   .toolbar{display:flex;gap:10px;padding:14px 34px;border-top:1px solid var(--line);background:#fafaf8}
   .toolbar button{padding:9px 16px;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:20px;cursor:pointer}
+  .toolbar button#fullscreenBtn{background:var(--red);color:#fff;border-color:var(--red);font-weight:700}
   .anim-on .hero-kicker,.anim-on .hero-title,.anim-on .hero-tagline,.anim-on .hero-cta{animation:riseIn .7s ease both}
   .anim-on .hero-title{animation-delay:.08s}
   .anim-on .hero-tagline{animation-delay:.16s}
@@ -501,6 +504,7 @@
         <div class="preview-empty" id="previewEmpty"><span class="icon">🌐</span><b>Nenhum site gerado ainda</b><span>Preencha o formulário ao lado e clique em "Gerar site" para ver a prévia aqui.</span></div>
         <div id="preview"></div>
         <div class="toolbar" id="toolbar" style="display:none">
+          <button id="fullscreenBtn">🖥️ Ver em tela cheia</button>
           <button id="downloadBtn">Baixar HTML</button>
           <button id="regenBtn">Gerar novamente</button>
         </div>
@@ -583,8 +587,12 @@ async function buscarFotosPexels(query, quantidade){
     if(urls.length === 0){
       throw new Error("Pexels não retornou fotos para esse termo");
     }
+    // Se a Pexels devolveu menos fotos reais do que o pedido, completa com
+    // fotos de reserva variadas (em vez de repetir a mesma foto real várias
+    // vezes na galeria).
+    let i = 0;
     while(urls.length < quantidade){
-      urls.push(urls[urls.length % (data.photos||[]).length] || urls[0]);
+      urls.push(`https://picsum.photos/seed/${encodeURIComponent(query)}extra${i++}/800/600`);
     }
     console.log("Fotos Pexels OK:", urls);
     return urls;
@@ -1078,6 +1086,77 @@ function buscar(){
 document.getElementById('gerarBtn').addEventListener('click', gerar);
 document.getElementById('regenBtn').addEventListener('click', gerar);
 document.getElementById('downloadBtn').addEventListener('click', baixar);
+document.getElementById('fullscreenBtn').addEventListener('click', verEmTelaCheia);
+
+// CSS do site gerado (montarSite()) — precisa ir embutido no HTML
+// exportado/aberto em nova aba, já que ali ele não herda mais o <style>
+// da página do gerador. Mantém as mesmas regras usadas na prévia.
+const CSS_SITE_GERADO = `
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;color:#161513;line-height:1.5}
+  :root{--red:#E5241E;--ink-soft:#5c5954;--line:#DEDAD1;--pink-bg:#FDEEEC}
+  .site-hero{position:relative;min-height:640px;color:#fff;background:#0e0e0e;overflow:hidden;display:flex;flex-direction:column}
+  .hero-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%) rotate(-6deg);font-size:min(22vw,260px);font-weight:800;color:rgba(255,255,255,.045);white-space:nowrap;pointer-events:none;letter-spacing:.02em;z-index:0;text-transform:uppercase}
+  .site-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:26px 44px;gap:16px;flex-wrap:wrap}
+  .site-nav .brandname{font-size:17px;letter-spacing:.06em;font-weight:700}
+  .site-nav .links{display:flex;gap:26px;font-size:13px;opacity:.9}
+  .site-nav .links span{cursor:pointer;padding-bottom:4px}
+  .site-nav .links span.active{border-bottom:2px solid var(--gold,var(--red))}
+  .site-nav .pin{font-size:12px;opacity:.75;display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .site-nav .cta-pill{background:var(--gold,var(--red));color:#fff;border:none;padding:10px 20px;border-radius:20px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .hero-flex{position:relative;z-index:1;flex:1;display:flex;align-items:center;gap:36px;padding:20px 44px 44px;flex-wrap:wrap}
+  .hero-left{flex:1 1 380px;max-width:560px}
+  .hero-kicker{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;line-height:1.7;margin-bottom:20px}
+  .hero-kicker::after{content:"";display:block;width:38px;height:2px;background:var(--gold,var(--red));margin-top:12px}
+  .hero-title{font-size:clamp(36px,6vw,64px);line-height:1.05;font-weight:800;margin:0 0 20px;letter-spacing:-.01em}
+  .hero-title em{display:block;font-style:italic;color:var(--gold,var(--red));font-weight:800}
+  .hero-tagline{font-size:12px;letter-spacing:.09em;text-transform:uppercase;opacity:.7;line-height:1.8;margin:0 0 30px;max-width:400px}
+  .hero-cta{background:var(--gold,var(--red));color:#fff;border:none;padding:15px 30px;border-radius:28px;font-weight:700;font-size:14px;cursor:default}
+  .hero-right{flex:1 1 280px;position:relative;display:flex;align-items:center;justify-content:center;min-height:320px}
+  .hero-blob{position:absolute;width:82%;aspect-ratio:1/1;border-radius:50%;background:radial-gradient(circle at 34% 28%,var(--gold,var(--red)),color-mix(in srgb,var(--gold,var(--red)) 30%,black) 78%)}
+  .hero-photo{position:relative;width:70%;aspect-ratio:1/1;object-fit:cover;border-radius:50%;box-shadow:0 30px 70px rgba(0,0,0,.55);z-index:1;background:var(--pink-bg)}
+  .site-feats{position:relative;z-index:1;display:flex;gap:26px;padding:20px 44px 26px;font-size:12px;opacity:.85;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08)}
+  .site-section{padding:52px 44px;border-top:1px solid var(--line)}
+  .site-section h3{font-size:20px;margin-bottom:14px;font-weight:700}
+  .site-section p{font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+  .servicos{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:18px}
+  .servico{background:var(--pink-bg);padding:18px;border-radius:10px;font-size:13.5px;font-weight:600}
+  .galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:22px}
+  .galeria img{width:100%;height:150px;object-fit:cover;border-radius:10px;display:block;background:#eee}
+  .depoimento{padding:52px 44px;border-top:1px solid var(--line);background:var(--pink-bg)}
+  .depoimento p{font-size:18px;font-style:italic;max-width:600px;line-height:1.5}
+  .depoimento span{font-size:12.5px;color:var(--ink-soft);display:block;margin-top:12px}
+  .site-contato{padding:52px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .site-contato .cta-final{background:var(--red);color:#fff;padding:12px 26px;border-radius:22px;font-size:13.5px;cursor:pointer;border:none;font-weight:700}
+  .site-footer{padding:24px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
+  .anim-on .hero-kicker,.anim-on .hero-title,.anim-on .hero-tagline,.anim-on .hero-cta{animation:riseIn .7s ease both}
+  .anim-on .hero-title{animation-delay:.08s}
+  .anim-on .hero-tagline{animation-delay:.16s}
+  .anim-on .hero-cta{animation-delay:.24s}
+  .anim-on .hero-photo{animation:riseIn .8s ease .1s both}
+  .anim-on .servico{animation:riseIn .5s ease both}
+  @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:760px){
+    .hero-flex{flex-direction:column;text-align:center}
+    .hero-kicker::after{margin:12px auto 0}
+    .hero-right{margin-top:10px}
+  }
+  @media(max-width:600px){
+    .site-nav .links,.site-nav .pin{display:none}
+  }
+`;
+
+function montarHtmlCompleto(){
+  const nomeEmpresa = document.getElementById('nome').value.trim() || 'site-gerado';
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(nomeEmpresa)}</title><style>${CSS_SITE_GERADO}</style></head><body>${siteHtmlFinal}</body></html>`;
+}
+
+function verEmTelaCheia(){
+  if(!siteHtmlFinal) return;
+  const blob = new Blob([montarHtmlCompleto()], {type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank', 'noopener');
+}
 
 function escolher(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function capitalizar(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
@@ -1201,10 +1280,11 @@ async function gerar(){
 
     status.textContent = "Buscando fotos reais (Pexels)...";
     const termoFoto = cidade ? `${ramo} ${cidade}` : ramo;
-    // 1 foto de capa + 4 fotos de galeria: site sempre sai com imagens reais.
-    const fotos = await buscarFotosPexels(termoFoto, 5);
+    // 1 foto de capa + 8 fotos de galeria: o site sempre sai com bastante
+    // imagem real (nunca só uma foto solitária).
+    const fotos = await buscarFotosPexels(termoFoto, 9);
     const heroImg = fotos[0];
-    const galeria = fotos.slice(1, 5);
+    const galeria = fotos.slice(1, 9);
     const animado = document.getElementById('animado').checked;
 
     siteHtmlFinal = montarSite(nome, corSelecionada, copy, heroImg, ramo, galeria, animado, cidade);
@@ -1301,8 +1381,7 @@ function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado, cidade){
 
 function baixar(){
   const nomeEmpresa = document.getElementById('nome').value.trim() || 'site-gerado';
-  const full = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(nomeEmpresa)}</title></head><body style="margin:0;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif">${siteHtmlFinal}</body></html>`;
-  const blob = new Blob([full], {type:"text/html"});
+  const blob = new Blob([montarHtmlCompleto()], {type:"text/html"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
