@@ -136,20 +136,37 @@
   .preview-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-soft);font-size:13.5px;padding:40px;text-align:center;gap:10px}
   .preview-empty .icon{font-size:38px;opacity:.35}
   .preview-empty b{color:var(--ink);font-size:14.5px;font-weight:700}
-  .site-hero{position:relative;min-height:620px;color:#fff;background:#0e0e0e;overflow:hidden}
-  .site-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.55)}
-  .site-hero .overlay{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;min-height:620px}
-  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:26px 44px}
+  /* Hero editorial: painel escuro com texto à esquerda + foto em destaque
+     circular à direita, no estilo de landing page premium. */
+  .site-hero{position:relative;min-height:640px;color:#fff;background:#0e0e0e;overflow:hidden;display:flex;flex-direction:column}
+  .hero-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%) rotate(-6deg);font-size:min(22vw,260px);font-weight:800;color:rgba(255,255,255,.045);white-space:nowrap;pointer-events:none;letter-spacing:.02em;z-index:0;text-transform:uppercase}
+  .site-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:26px 44px;gap:16px;flex-wrap:wrap}
   .site-nav .brandname{font-size:17px;letter-spacing:.06em;font-weight:700}
   .site-nav .links{display:flex;gap:26px;font-size:13px;opacity:.9}
-  .site-nav .links span{cursor:pointer}
-  .site-nav .cta-pill{border:1px solid rgba(255,255,255,.5);padding:8px 16px;border-radius:20px;font-size:12.5px;cursor:pointer}
-  .site-hero-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 44px;max-width:580px}
-  .site-hero-body h2{font-size:38px;line-height:1.18;margin-bottom:18px;font-weight:700}
-  .site-hero-body h2 em{font-style:italic;font-weight:400}
-  .site-hero-body p{opacity:.88;font-size:15.5px;max-width:440px;margin:0 0 24px;line-height:1.6}
-  .site-hero-body button{align-self:flex-start;background:var(--red);color:#fff;border:none;padding:13px 28px;border-radius:22px;font-weight:700;font-size:14px;cursor:default}
-  .site-feats{display:flex;gap:26px;padding:20px 44px;font-size:12px;opacity:.85;flex-wrap:wrap}
+  .site-nav .links span{cursor:pointer;padding-bottom:4px}
+  .site-nav .links span.active{border-bottom:2px solid var(--gold,var(--red))}
+  .site-nav .pin{font-size:12px;opacity:.75;display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .site-nav .cta-pill{background:var(--gold,var(--red));color:#fff;border:none;padding:10px 20px;border-radius:20px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .hero-flex{position:relative;z-index:1;flex:1;display:flex;align-items:center;gap:36px;padding:20px 44px 44px;flex-wrap:wrap}
+  .hero-left{flex:1 1 380px;max-width:560px}
+  .hero-kicker{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;line-height:1.7;margin-bottom:20px}
+  .hero-kicker::after{content:"";display:block;width:38px;height:2px;background:var(--gold,var(--red));margin-top:12px}
+  .hero-title{font-size:clamp(36px,6vw,64px);line-height:1.05;font-weight:800;margin:0 0 20px;letter-spacing:-.01em}
+  .hero-title em{display:block;font-style:italic;color:var(--gold,var(--red));font-weight:800}
+  .hero-tagline{font-size:12px;letter-spacing:.09em;text-transform:uppercase;opacity:.7;line-height:1.8;margin:0 0 30px;max-width:400px}
+  .hero-cta{background:var(--gold,var(--red));color:#fff;border:none;padding:15px 30px;border-radius:28px;font-weight:700;font-size:14px;cursor:default}
+  .hero-right{flex:1 1 280px;position:relative;display:flex;align-items:center;justify-content:center;min-height:320px}
+  .hero-blob{position:absolute;width:82%;aspect-ratio:1/1;border-radius:50%;background:radial-gradient(circle at 34% 28%,var(--gold,var(--red)),color-mix(in srgb,var(--gold,var(--red)) 30%,black) 78%)}
+  .hero-photo{position:relative;width:70%;aspect-ratio:1/1;object-fit:cover;border-radius:50%;box-shadow:0 30px 70px rgba(0,0,0,.55);z-index:1}
+  .site-feats{position:relative;z-index:1;display:flex;gap:26px;padding:20px 44px 26px;font-size:12px;opacity:.85;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08)}
+  @media(max-width:760px){
+    .hero-flex{flex-direction:column;text-align:center}
+    .hero-kicker::after{margin:12px auto 0}
+    .hero-right{margin-top:10px}
+  }
+  @media(max-width:600px){
+    .site-nav .links,.site-nav .pin{display:none}
+  }
   .site-section{padding:52px 44px;border-top:1px solid var(--line)}
   .site-section h3{font-size:20px;margin-bottom:14px;font-weight:700}
   .site-section p{font-size:14.5px;color:var(--ink-soft);line-height:1.65}
@@ -165,9 +182,11 @@
   .site-footer{padding:24px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
   .toolbar{display:flex;gap:10px;padding:14px 34px;border-top:1px solid var(--line);background:#fafaf8}
   .toolbar button{padding:9px 16px;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:20px;cursor:pointer}
-  .anim-on .site-hero-body h2,.anim-on .site-hero-body p,.anim-on .site-hero-body button{animation:riseIn .7s ease both}
-  .anim-on .site-hero-body p{animation-delay:.12s}
-  .anim-on .site-hero-body button{animation-delay:.24s}
+  .anim-on .hero-kicker,.anim-on .hero-title,.anim-on .hero-tagline,.anim-on .hero-cta{animation:riseIn .7s ease both}
+  .anim-on .hero-title{animation-delay:.08s}
+  .anim-on .hero-tagline{animation-delay:.16s}
+  .anim-on .hero-cta{animation-delay:.24s}
+  .anim-on .hero-photo{animation:riseIn .8s ease .1s both}
   .anim-on .servico{animation:riseIn .5s ease both}
   @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
@@ -1063,36 +1082,57 @@ document.getElementById('downloadBtn').addEventListener('click', baixar);
 function escolher(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function capitalizar(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
 
-function classificarRamo(ramo){
-  const r = (ramo||'').toLowerCase();
-  const premium = ['clínica','advocacia','imobiliária','imoveis','odontológica','odontologia','arquitetura','consultoria','médic'];
-  const media = ['restaurante','academia','pet','salão','barbearia','oficina'];
-  if(premium.some(p=>r.includes(p))) return 'premium';
-  if(media.some(p=>r.includes(p))) return 'media';
+// Compara por palavra inteira (não por substring), para "bar" não bater com
+// "barbearia", "pet" não bater com "petiscaria", etc.
+function contemPalavra(texto, palavras){
+  const t = (texto||'').toLowerCase();
+  return palavras.some(p => new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b', 'i').test(t));
+}
+
+// Classifica o ramo para escolher um CTA e um vocabulário coerentes
+// (pedir comida, agendar horário, ou pedir orçamento/contato).
+function categoriaNegocio(ramo){
+  const comida = ['restaurante','padaria','lanchonete','pizzaria','hamburgueria','açaí','acai','sorveteria','cafeteria','confeitaria','bar','doceria','churrascaria','food truck','marmita','buffet','açougue','peixaria','hortifruti','mercearia'];
+  const agenda = ['clínica','consultório','odontológica','odontologia','salão','barbearia','estética','academia','pet','veterinária','fisioterapia','psicologia','nutricionista','massagem','spa','tatuagem','yoga','pilates','dança','autoescola','depilação','sobrancelha'];
+  if(contemPalavra(ramo, comida)) return 'comida';
+  if(contemPalavra(ramo, agenda)) return 'agenda';
   return 'padrao';
+}
+
+// Primeira palavra do ramo, capitalizada — vira o título gigante do hero
+// (ex.: "padaria artesanal" → "Padaria").
+function ramoCurto(ramo){
+  const primeira = (ramo||'negócio').trim().split(/\s+/)[0] || 'negócio';
+  return capitalizar(primeira.toLowerCase());
 }
 
 // Gera o conteúdo de copywriting do site inteiramente no navegador — sem
 // depender de nenhuma API externa de IA (que exigiria chave secreta e nunca
 // funcionaria a partir do navegador). Sempre entrega um resultado profissional.
 function gerarCopyLocal(nome, ramo, cidade, obs, aprimorado){
-  const ramoCap = capitalizar(ramo || 'negócio');
   const ramoLower = (ramo || 'negócio').toLowerCase();
   const local = cidade ? ` em ${cidade}` : '';
-  const tipo = classificarRamo(ramo);
+  const categoria = categoriaNegocio(ramo);
 
-  const paresHeadline = {
-    premium: [["Excelência e cuidado", "em cada detalhe"], ["Confiança que", "você pode sentir"], ["Tradição e resultado", "lado a lado"]],
-    media: [["Qualidade que", "você percebe na hora"], ["Atendimento de verdade", "do começo ao fim"], ["Feito para", "durar e satisfazer"]],
-    padrao: [["Perto de você", "e pronto pra ajudar"], ["Feito com cuidado", "em cada detalhe"], ["Qualidade e atenção", "em primeiro lugar"]]
+  // Título gigante no estilo "[Ramo] que [verbo]" (ex.: "Ramen que conecta").
+  const headline = ramoCurto(ramo);
+  const verbos = {
+    comida: ["conecta","encanta","surpreende","alimenta com carinho"],
+    agenda: ["cuida de você","transforma","inspira confiança","acolhe"],
+    padrao: ["conecta","transforma","surpreende","aproxima"]
   };
-  const [headline, headlineDestaque] = escolher(paresHeadline[tipo]);
+  const headlineDestaque = `que ${escolher(verbos[categoria])}`;
 
-  const subheadline = escolher([
-    `${ramoCap} de referência${local}, com atendimento próximo e resultado que você sente.`,
-    `${nome} une experiência e cuidado para entregar o melhor em ${ramoLower}${local}.`,
-    `Referência em ${ramoLower}${local}, com atendimento atencioso do início ao fim.`
-  ]);
+  // Frase pequena (olho/eyebrow) acima do título.
+  const unidade = { comida: ["prato","sabor","receita"], agenda: ["atendimento","consulta","sessão"], padrao: ["detalhe","trabalho","projeto"] }[categoria];
+  const kicker = `${escolher(["Tradição e cuidado","Qualidade e capricho","Excelência e atenção","Dedicação de verdade"])} em cada ${escolher(unidade)}`;
+
+  // Tagline curta em caixa alta, logo abaixo do título.
+  const subheadline = escolher({
+    comida: ["Mais que uma refeição, uma experiência.", "Sabor de verdade, em cada prato.", "Feito com cuidado, do preparo à mesa."],
+    agenda: ["Mais que um atendimento, um cuidado.", "Sua confiança em primeiro lugar.", "Atenção de verdade, em cada visita."],
+    padrao: ["Mais que um serviço, uma experiência.", "Qualidade que você sente na hora.", "Cuidado de verdade, do início ao fim."]
+  }[categoria]);
 
   const sobreExtra = obs ? ` ${obs}.` : '';
   const sobre = aprimorado
@@ -1108,8 +1148,13 @@ function gerarCopyLocal(nome, ramo, cidade, obs, aprimorado){
   const bancoFeats = ["Atendimento ágil","Profissionais qualificados","Preço justo","Localização estratégica","Anos de experiência","Clientes satisfeitos","Equipe capacitada","Horário flexível","Atendimento humanizado","Estrutura completa"];
   const feats = [...bancoFeats].sort(()=>Math.random()-0.5).slice(0,4);
 
-  const cta = escolher(["Fale conosco agora","Agende seu horário","Peça um orçamento","Entre em contato"]);
-  const navLinks = ["Início","Serviços","Contato"];
+  const ctaPorCategoria = {
+    comida: ["Fazer pedido","Ver cardápio","Peça já"],
+    agenda: ["Agendar horário","Marcar consulta","Reservar horário"],
+    padrao: ["Fale conosco","Solicitar orçamento","Entre em contato"]
+  };
+  const cta = escolher(ctaPorCategoria[categoria]);
+  const navLinks = ["Início","Serviços","Sobre nós","Contato"];
 
   const depoimento = aprimorado
     ? escolher([
@@ -1124,7 +1169,7 @@ function gerarCopyLocal(nome, ramo, cidade, obs, aprimorado){
       ]);
   const depoimentoAutor = `${escolher(["Fernanda M.","Carlos R.","Juliana S.","Marcos P.","Beatriz L.","André T."])}${cidade ? ', ' + cidade : ''}`;
 
-  return { headline, headlineDestaque, subheadline, sobre, servicos, cta, navLinks, feats, depoimento, depoimentoAutor };
+  return { headline, headlineDestaque, kicker, subheadline, sobre, servicos, cta, navLinks, feats, depoimento, depoimentoAutor };
 }
 
 async function gerar(){
@@ -1162,7 +1207,7 @@ async function gerar(){
     const galeria = fotos.slice(1, 5);
     const animado = document.getElementById('animado').checked;
 
-    siteHtmlFinal = montarSite(nome, corSelecionada, copy, heroImg, ramo, galeria, animado);
+    siteHtmlFinal = montarSite(nome, corSelecionada, copy, heroImg, ramo, galeria, animado, cidade);
     document.getElementById('preview').innerHTML = siteHtmlFinal;
     document.getElementById('toolbar').style.display = 'flex';
     mostrarSugestaoPreco(ramo);
@@ -1183,48 +1228,54 @@ async function gerar(){
 }
 
 function mostrarSugestaoPreco(ramo){
-  const r = ramo.toLowerCase();
   let min = 300, max = 600;
-  const premium = ['clínica','advocacia','imobiliária','imoveis','odontológica','odontologia','arquitetura','consultoria','médic'];
+  const premium = ['clínica','advocacia','imobiliária','imoveis','odontológica','odontologia','arquitetura','consultoria','médico','médica'];
   const media = ['restaurante','academia','pet','salão','barbearia','oficina'];
-  if(premium.some(p=>r.includes(p))){ min=700; max=1500; }
-  else if(media.some(p=>r.includes(p))){ min=450; max=900; }
+  if(contemPalavra(ramo, premium)){ min=700; max=1500; }
+  else if(contemPalavra(ramo, media)){ min=450; max=900; }
   const sugestao = Math.round((min+max)/2/10)*10;
   document.getElementById('precoSugestao').style.display = 'block';
   document.getElementById('precoValor').textContent = 'R$ '+sugestao;
   document.getElementById('precoFaixa').textContent = `Faixa de mercado: R$ ${min} a R$ ${max}`;
 }
 
-function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado){
+function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado, cidade){
   const nomeSeguro = esc(nome);
   const ramoSeguro = esc(ramo);
   const servicosHtml = copy.servicos.map(s=>`<div class="servico">${esc(s)}</div>`).join("");
-  const navHtml = (copy.navLinks||["Início","Serviços","Contato"]).map((l,i)=>`<span onclick="document.getElementById('gsec${i}').scrollIntoView({behavior:'smooth'})">${esc(l)}</span>`).join("");
+  // gsec0=Início(hero) · gsec1=Sobre nós · gsec2=Serviços · gsec3=Contato
+  const navHtml = (copy.navLinks||["Início","Sobre nós","Serviços","Contato"]).map((l,i)=>`<span class="${i===0?'active':''}" onclick="document.getElementById('gsec${i}').scrollIntoView({behavior:'smooth'})">${esc(l)}</span>`).join("");
   const featsHtml = (copy.feats||[]).map(f=>`<span>${esc(f)}</span>`).join("");
   const galHtml = (galeria||[]).map(g=>`<img src="${esc(g)}" alt="${ramoSeguro}" loading="lazy" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${encodeURIComponent(ramo)}fallback/800/600'">`).join("");
   return `
     <div class="${animado?'anim-on':''}">
     <div class="site-hero" id="gsec0" style="--gold:${cor}">
-      <img src="${esc(heroImg)}" alt="${ramoSeguro}" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${encodeURIComponent(ramo)}hero/1200/600'">
-      <div class="overlay">
-        <div class="site-nav">
-          <div class="brandname">${nomeSeguro.toUpperCase()}</div>
-          <div class="links">${navHtml}</div>
-          <div class="cta-pill" onclick="document.getElementById('gsec2').scrollIntoView({behavior:'smooth'})">Fale conosco</div>
-        </div>
-        <div class="site-hero-body">
-          <h2>${esc(copy.headline)}<br><em>${esc(copy.headlineDestaque||"")}</em></h2>
-          <p>${esc(copy.subheadline)}</p>
-          <button style="background:${cor}">${esc(copy.cta)}</button>
-        </div>
-        <div class="site-feats">${featsHtml}</div>
+      <div class="hero-watermark">${ramoSeguro}</div>
+      <div class="site-nav">
+        <div class="brandname">${nomeSeguro.toUpperCase()}</div>
+        <div class="links">${navHtml}</div>
+        ${cidade ? `<div class="pin">📍 ${esc(cidade)}</div>` : ''}
+        <div class="cta-pill" onclick="document.getElementById('gsec3').scrollIntoView({behavior:'smooth'})">${esc(copy.cta)} →</div>
       </div>
+      <div class="hero-flex">
+        <div class="hero-left">
+          <div class="hero-kicker">${esc(copy.kicker||'')}</div>
+          <h2 class="hero-title">${esc(copy.headline)}<br><em>${esc(copy.headlineDestaque||"")}</em></h2>
+          <p class="hero-tagline">${esc(copy.subheadline)}</p>
+          <button class="hero-cta">${esc(copy.cta)} →</button>
+        </div>
+        <div class="hero-right">
+          <div class="hero-blob"></div>
+          <img class="hero-photo" src="${esc(heroImg)}" alt="${ramoSeguro}" loading="lazy" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${encodeURIComponent(ramo)}hero/800/800'">
+        </div>
+      </div>
+      <div class="site-feats">${featsHtml}</div>
     </div>
-    <div class="site-section">
+    <div class="site-section" id="gsec1">
       <h3>Sobre ${nomeSeguro}</h3>
       <p>${esc(copy.sobre)}</p>
     </div>
-    <div class="site-section" id="gsec1">
+    <div class="site-section" id="gsec2">
       <h3>Serviços</h3>
       <div class="servicos">${servicosHtml}</div>
       <div class="galeria">${galHtml}</div>
@@ -1233,7 +1284,7 @@ function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado){
       <p>"${esc(copy.depoimento||'')}"</p>
       <span>${esc(copy.depoimentoAutor||'')}</span>
     </div>
-    <div class="site-contato" id="gsec2">
+    <div class="site-contato" id="gsec3">
       <div>
         <h3 style="font-size:18px;margin-bottom:6px">Vamos conversar?</h3>
         <p style="font-size:13px;color:var(--ink-soft);margin:0">${ramoSeguro} em ${nomeSeguro}</p>
