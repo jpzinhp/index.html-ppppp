@@ -810,9 +810,13 @@ async function geocodificarCidade(cidade){
   throw new Error(`Não foi possível localizar "${cidade}" no Brasil. Confira a grafia da cidade/bairro.`);
 }
 
+// Vários espelhos, de infraestruturas diferentes, para não depender de um
+// único provedor caso ele esteja fora do ar ou bloqueado na rede do usuário.
 const OVERPASS_MIRRORS = [
   "https://overpass-api.de/api/interpreter",
+  "https://overpass.osm.ch/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass.nchc.org.tw/api/interpreter",
   "https://lz4.overpass-api.de/api/interpreter",
   "https://z.overpass-api.de/api/interpreter"
 ];
@@ -822,34 +826,28 @@ function temSiteCadastrado(tags){
   return !!(tags.website || tags['contact:website'] || tags.url || tags['website:menu']);
 }
 
-async function buscarLeadsReais(categoria, cidade){
-  const { lat, lon } = await geocodificarCidade(cidade);
-  const tags = osmTagPorCategoria[categoria] || ['shop'];
-  // Busca em node, way e relation para não perder comércios mapeados como
-  // edificação (bem comum no Brasil), com "out center" para obter coordenadas
-  // também de ways/relations.
-  const filtros = tags.map(t=>{
-    const [k,v] = t.split('=');
-    return `node["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});way["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});relation["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});`;
-  }).join("");
-  const query = `[out:json][timeout:25];(${filtros});out center 60;`;
-
-  let resp = null;
+// Tenta cada espelho em sequência até um responder com sucesso.
+// timeoutMs é por tentativa (não soma entre espelhos).
+async function consultarOverpass(query, timeoutMs, mirrors = OVERPASS_MIRRORS){
   const todosErros = [];
-  for(const mirror of OVERPASS_MIRRORS){
+  for(const mirror of mirrors){
     try{
-      const r = await fetchComTimeout(mirror + "?data=" + encodeURIComponent(query), {}, 15000);
-      if(r.ok){ resp = r; break; }
+      const r = await fetchComTimeout(mirror + "?data=" + encodeURIComponent(query), {}, timeoutMs);
+      if(r.ok){
+        const data = await r.json();
+        return data.elements || [];
+      }
       todosErros.push(mirror + " → status " + r.status);
     }catch(e){
       todosErros.push(mirror + " → " + e.message);
     }
   }
-  if(!resp) throw new Error("Todos os servidores do OpenStreetMap falharam: " + todosErros.join(" | "));
+  throw new Error("Todos os servidores do OpenStreetMap falharam: " + todosErros.join(" | "));
+}
 
-  const data = await resp.json();
+function extrairLeads(elementos){
   const vistos = new Set();
-  return (data.elements||[])
+  return (elementos||[])
     .filter(el => el.tags && el.tags.name && !temSiteCadastrado(el.tags))
     .filter(el => {
       const chave = (el.tags.name + '|' + (el.tags['addr:street']||'')).toLowerCase();
@@ -857,12 +855,45 @@ async function buscarLeadsReais(categoria, cidade){
       vistos.add(chave);
       return true;
     })
-    .slice(0, 18)
     .map(el => ({
       nome: el.tags.name,
       endereco: [el.tags['addr:street'], el.tags['addr:housenumber'], el.tags['addr:suburb']].filter(Boolean).join(', ') || "Endereço não informado no OSM",
       telefone: el.tags.phone || el.tags['contact:phone'] || null
     }));
+}
+
+async function buscarLeadsReais(categoria, cidade){
+  const { lat, lon } = await geocodificarCidade(cidade);
+  const tags = osmTagPorCategoria[categoria] || ['shop'];
+
+  // Fase 1 — busca rápida e leve, só em "node" (onde está a grande maioria
+  // dos comércios mapeados no Brasil). Precisa funcionar de forma confiável.
+  const nodeFiltros = tags.map(t=>{
+    const [k,v] = t.split('=');
+    return `node["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});`;
+  }).join("");
+  const elementosNode = await consultarOverpass(
+    `[out:json][timeout:15];(${nodeFiltros});out center 40;`, 9000
+  );
+
+  // Fase 2 — complementa com "way"/"relation" (comércios mapeados como
+  // edificação), que são mais lentos de calcular. É best-effort, tentando
+  // só nos 3 primeiros espelhos e com prazo curto: se travar ou falhar,
+  // mantém os resultados da fase 1 e segue em frente sem travar a busca.
+  let elementosWR = [];
+  try{
+    const wrFiltros = tags.map(t=>{
+      const [k,v] = t.split('=');
+      return `way["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});relation["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});`;
+    }).join("");
+    elementosWR = await consultarOverpass(
+      `[out:json][timeout:20];(${wrFiltros});out center 40;`, 12000, OVERPASS_MIRRORS.slice(0, 3)
+    );
+  }catch(e){
+    console.warn("Complemento way/relation indisponível, seguindo só com nodes:", e.message);
+  }
+
+  return extrairLeads([...elementosNode, ...elementosWR]).slice(0, 18);
 }
 
 document.getElementById('filtrarBtn').addEventListener('click', filtrarLeads);
