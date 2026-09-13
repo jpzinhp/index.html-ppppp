@@ -133,23 +133,42 @@
   .gstatus{font-size:12.5px;color:var(--ink-soft);margin-top:10px;min-height:16px}
   .gerr{color:var(--red);font-size:12.5px;margin-top:8px}
   .preview-panel{border:1px solid var(--line);background:#fff;min-height:460px;display:flex;flex-direction:column;border-radius:16px;overflow:hidden}
+  .preview-panel:has(#preview:not(:empty)){min-height:85vh}
+  #preview{max-height:85vh;overflow-y:auto}
   .preview-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-soft);font-size:13.5px;padding:40px;text-align:center;gap:10px}
   .preview-empty .icon{font-size:38px;opacity:.35}
   .preview-empty b{color:var(--ink);font-size:14.5px;font-weight:700}
-  .site-hero{position:relative;min-height:620px;color:#fff;background:#0e0e0e;overflow:hidden}
-  .site-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.55)}
-  .site-hero .overlay{position:relative;z-index:1;display:flex;flex-direction:column;height:100%;min-height:620px}
-  .site-nav{display:flex;align-items:center;justify-content:space-between;padding:26px 44px}
+  /* Hero editorial: painel escuro com texto à esquerda + foto em destaque
+     circular à direita, no estilo de landing page premium. */
+  .site-hero{position:relative;min-height:640px;color:#fff;background:#0e0e0e;overflow:hidden;display:flex;flex-direction:column}
+  .hero-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%) rotate(-6deg);font-size:min(22vw,260px);font-weight:800;color:rgba(255,255,255,.045);white-space:nowrap;pointer-events:none;letter-spacing:.02em;z-index:0;text-transform:uppercase}
+  .site-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:26px 44px;gap:16px;flex-wrap:wrap}
   .site-nav .brandname{font-size:17px;letter-spacing:.06em;font-weight:700}
   .site-nav .links{display:flex;gap:26px;font-size:13px;opacity:.9}
-  .site-nav .links span{cursor:pointer}
-  .site-nav .cta-pill{border:1px solid rgba(255,255,255,.5);padding:8px 16px;border-radius:20px;font-size:12.5px;cursor:pointer}
-  .site-hero-body{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 44px;max-width:580px}
-  .site-hero-body h2{font-size:38px;line-height:1.18;margin-bottom:18px;font-weight:700}
-  .site-hero-body h2 em{font-style:italic;font-weight:400}
-  .site-hero-body p{opacity:.88;font-size:15.5px;max-width:440px;margin:0 0 24px;line-height:1.6}
-  .site-hero-body button{align-self:flex-start;background:var(--red);color:#fff;border:none;padding:13px 28px;border-radius:22px;font-weight:700;font-size:14px;cursor:default}
-  .site-feats{display:flex;gap:26px;padding:20px 44px;font-size:12px;opacity:.85;flex-wrap:wrap}
+  .site-nav .links span{cursor:pointer;padding-bottom:4px}
+  .site-nav .links span.active{border-bottom:2px solid var(--gold,var(--red))}
+  .site-nav .pin{font-size:12px;opacity:.75;display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .site-nav .cta-pill{background:var(--gold,var(--red));color:#fff;border:none;padding:10px 20px;border-radius:20px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .hero-flex{position:relative;z-index:1;flex:1;display:flex;align-items:center;gap:36px;padding:20px 44px 44px;flex-wrap:wrap}
+  .hero-left{flex:1 1 380px;max-width:560px}
+  .hero-kicker{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;line-height:1.7;margin-bottom:20px}
+  .hero-kicker::after{content:"";display:block;width:38px;height:2px;background:var(--gold,var(--red));margin-top:12px}
+  .hero-title{font-size:clamp(36px,6vw,64px);line-height:1.05;font-weight:800;margin:0 0 20px;letter-spacing:-.01em}
+  .hero-title em{display:block;font-style:italic;color:var(--gold,var(--red));font-weight:800}
+  .hero-tagline{font-size:12px;letter-spacing:.09em;text-transform:uppercase;opacity:.7;line-height:1.8;margin:0 0 30px;max-width:400px}
+  .hero-cta{background:var(--gold,var(--red));color:#fff;border:none;padding:15px 30px;border-radius:28px;font-weight:700;font-size:14px;cursor:default}
+  .hero-right{flex:1 1 280px;position:relative;display:flex;align-items:center;justify-content:center;min-height:320px}
+  .hero-blob{position:absolute;width:82%;aspect-ratio:1/1;border-radius:50%;background:radial-gradient(circle at 34% 28%,var(--gold,var(--red)),color-mix(in srgb,var(--gold,var(--red)) 30%,black) 78%)}
+  .hero-photo{position:relative;width:70%;aspect-ratio:1/1;object-fit:cover;border-radius:50%;box-shadow:0 30px 70px rgba(0,0,0,.55);z-index:1}
+  .site-feats{position:relative;z-index:1;display:flex;gap:26px;padding:20px 44px 26px;font-size:12px;opacity:.85;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08)}
+  @media(max-width:760px){
+    .hero-flex{flex-direction:column;text-align:center}
+    .hero-kicker::after{margin:12px auto 0}
+    .hero-right{margin-top:10px}
+  }
+  @media(max-width:600px){
+    .site-nav .links,.site-nav .pin{display:none}
+  }
   .site-section{padding:52px 44px;border-top:1px solid var(--line)}
   .site-section h3{font-size:20px;margin-bottom:14px;font-weight:700}
   .site-section p{font-size:14.5px;color:var(--ink-soft);line-height:1.65}
@@ -165,9 +184,12 @@
   .site-footer{padding:24px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
   .toolbar{display:flex;gap:10px;padding:14px 34px;border-top:1px solid var(--line);background:#fafaf8}
   .toolbar button{padding:9px 16px;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:20px;cursor:pointer}
-  .anim-on .site-hero-body h2,.anim-on .site-hero-body p,.anim-on .site-hero-body button{animation:riseIn .7s ease both}
-  .anim-on .site-hero-body p{animation-delay:.12s}
-  .anim-on .site-hero-body button{animation-delay:.24s}
+  .toolbar button#fullscreenBtn{background:var(--red);color:#fff;border-color:var(--red);font-weight:700}
+  .anim-on .hero-kicker,.anim-on .hero-title,.anim-on .hero-tagline,.anim-on .hero-cta{animation:riseIn .7s ease both}
+  .anim-on .hero-title{animation-delay:.08s}
+  .anim-on .hero-tagline{animation-delay:.16s}
+  .anim-on .hero-cta{animation-delay:.24s}
+  .anim-on .hero-photo{animation:riseIn .8s ease .1s both}
   .anim-on .servico{animation:riseIn .5s ease both}
   @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
@@ -427,7 +449,7 @@
 
     <div style="font-size:11.5px;font-weight:800;color:var(--red);letter-spacing:.03em;margin-bottom:8px">O SITE GERADO INCLUI</div>
     <div style="display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px">
-      <span style="font-size:13px">✅ <b>Fotos reais do ramo do negócio</b><br><span style="color:var(--ink-soft);font-size:12px">Buscadas automaticamente em banco de imagens real, no topo e na galeria.</span></span>
+      <span style="font-size:13px">✅ <b>Fotos fotorrealistas do ramo do negócio</b><br><span style="color:var(--ink-soft);font-size:12px">Geradas por IA em estilo fotográfico realista (com fotos reais como alternativa), no topo e na galeria.</span></span>
     </div>
     <label style="display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:18px;cursor:pointer">
       <input type="checkbox" id="extraOpus" checked style="margin-top:3px">
@@ -482,6 +504,7 @@
         <div class="preview-empty" id="previewEmpty"><span class="icon">🌐</span><b>Nenhum site gerado ainda</b><span>Preencha o formulário ao lado e clique em "Gerar site" para ver a prévia aqui.</span></div>
         <div id="preview"></div>
         <div class="toolbar" id="toolbar" style="display:none">
+          <button id="fullscreenBtn">🖥️ Ver em tela cheia</button>
           <button id="downloadBtn">Baixar HTML</button>
           <button id="regenBtn">Gerar novamente</button>
         </div>
@@ -564,8 +587,12 @@ async function buscarFotosPexels(query, quantidade){
     if(urls.length === 0){
       throw new Error("Pexels não retornou fotos para esse termo");
     }
+    // Se a Pexels devolveu menos fotos reais do que o pedido, completa com
+    // fotos de reserva variadas (em vez de repetir a mesma foto real várias
+    // vezes na galeria).
+    let i = 0;
     while(urls.length < quantidade){
-      urls.push(urls[urls.length % (data.photos||[]).length] || urls[0]);
+      urls.push(`https://picsum.photos/seed/${encodeURIComponent(query)}extra${i++}/800/600`);
     }
     console.log("Fotos Pexels OK:", urls);
     return urls;
@@ -577,6 +604,60 @@ async function buscarFotosPexels(query, quantidade){
     }
     return fallback;
   }
+}
+
+// --- Imagens geradas por IA, com aparência fotorrealista ---
+// Usa o Pollinations (gratuito, sem chave/cadastro) com um modelo voltado
+// a fotorrealismo. Os prompts pedem explicitamente "foto real" e evitam
+// termos de ilustração/arte, para o resultado parecer uma fotografia de
+// verdade em vez de uma arte estilizada.
+// Prompts em inglês (os modelos de geração de imagem produzem resultados
+// bem mais realistas com termos em inglês) — só o ramo do negócio em si
+// fica em português, exatamente como o usuário digitou.
+const ANGULOS_FOTO_IA = ["wide interior view", "storefront and entrance", "staff serving a customer", "close-up of the space and equipment"];
+
+function promptFotoIA(ramo, indice){
+  const estilo = escolher([
+    "professional DSLR photography, natural light",
+    "editorial magazine photography, high definition",
+    "realistic commercial photography, sharp focus, 35mm lens"
+  ]);
+  const angulo = ANGULOS_FOTO_IA[indice % ANGULOS_FOTO_IA.length];
+  return `${estilo}, real photo of a ${ramo} business in Brazil, ${angulo}, modern and clean environment, natural colors, ultra detailed, 4k, photorealistic, no text, no logo, no watermark, not an illustration, not a drawing, not a painting`;
+}
+
+function urlFotoIA(ramo, indice, w, h){
+  const seed = Math.floor(Math.random()*1000000) + indice;
+  const prompt = encodeURIComponent(promptFotoIA(ramo, indice));
+  return `https://image.pollinations.ai/prompt/${prompt}?width=${w}&height=${h}&seed=${seed}&nologo=true&model=flux-realism`;
+}
+
+// Testa rapidamente se o gerador de imagens por IA está respondendo antes
+// de montar a galeria toda com ele — se estiver fora do ar, usamos fotos
+// reais (Pexels/Picsum) no lugar, sem travar nem quebrar a geração.
+async function iaDeImagensDisponivel(){
+  try{
+    const testUrl = `https://image.pollinations.ai/prompt/teste?width=64&height=64&nologo=true`;
+    const resp = await fetch(testUrl, {
+      signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(9000) : undefined
+    });
+    return resp.ok;
+  }catch(e){
+    console.warn("Gerador de imagens por IA indisponível agora, usando fotos reais como alternativa:", e.message);
+    return false;
+  }
+}
+
+async function buscarImagensSite(termoFoto, ramo, quantidade){
+  const disponivel = await iaDeImagensDisponivel();
+  if(disponivel){
+    const urls = [];
+    for(let i=0;i<quantidade;i++){
+      urls.push(urlFotoIA(ramo, i, i===0?1200:800, i===0?800:600));
+    }
+    return urls;
+  }
+  return buscarFotosPexels(termoFoto, quantidade);
 }
 
 function irParaLeads(){
@@ -810,9 +891,13 @@ async function geocodificarCidade(cidade){
   throw new Error(`Não foi possível localizar "${cidade}" no Brasil. Confira a grafia da cidade/bairro.`);
 }
 
+// Vários espelhos, de infraestruturas diferentes, para não depender de um
+// único provedor caso ele esteja fora do ar ou bloqueado na rede do usuário.
 const OVERPASS_MIRRORS = [
   "https://overpass-api.de/api/interpreter",
+  "https://overpass.osm.ch/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
+  "https://overpass.nchc.org.tw/api/interpreter",
   "https://lz4.overpass-api.de/api/interpreter",
   "https://z.overpass-api.de/api/interpreter"
 ];
@@ -822,34 +907,28 @@ function temSiteCadastrado(tags){
   return !!(tags.website || tags['contact:website'] || tags.url || tags['website:menu']);
 }
 
-async function buscarLeadsReais(categoria, cidade){
-  const { lat, lon } = await geocodificarCidade(cidade);
-  const tags = osmTagPorCategoria[categoria] || ['shop'];
-  // Busca em node, way e relation para não perder comércios mapeados como
-  // edificação (bem comum no Brasil), com "out center" para obter coordenadas
-  // também de ways/relations.
-  const filtros = tags.map(t=>{
-    const [k,v] = t.split('=');
-    return `node["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});way["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});relation["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});`;
-  }).join("");
-  const query = `[out:json][timeout:25];(${filtros});out center 60;`;
-
-  let resp = null;
+// Tenta cada espelho em sequência até um responder com sucesso.
+// timeoutMs é por tentativa (não soma entre espelhos).
+async function consultarOverpass(query, timeoutMs, mirrors = OVERPASS_MIRRORS){
   const todosErros = [];
-  for(const mirror of OVERPASS_MIRRORS){
+  for(const mirror of mirrors){
     try{
-      const r = await fetchComTimeout(mirror + "?data=" + encodeURIComponent(query), {}, 15000);
-      if(r.ok){ resp = r; break; }
+      const r = await fetchComTimeout(mirror + "?data=" + encodeURIComponent(query), {}, timeoutMs);
+      if(r.ok){
+        const data = await r.json();
+        return data.elements || [];
+      }
       todosErros.push(mirror + " → status " + r.status);
     }catch(e){
       todosErros.push(mirror + " → " + e.message);
     }
   }
-  if(!resp) throw new Error("Todos os servidores do OpenStreetMap falharam: " + todosErros.join(" | "));
+  throw new Error("Todos os servidores do OpenStreetMap falharam: " + todosErros.join(" | "));
+}
 
-  const data = await resp.json();
+function extrairLeads(elementos){
   const vistos = new Set();
-  return (data.elements||[])
+  return (elementos||[])
     .filter(el => el.tags && el.tags.name && !temSiteCadastrado(el.tags))
     .filter(el => {
       const chave = (el.tags.name + '|' + (el.tags['addr:street']||'')).toLowerCase();
@@ -857,12 +936,45 @@ async function buscarLeadsReais(categoria, cidade){
       vistos.add(chave);
       return true;
     })
-    .slice(0, 18)
     .map(el => ({
       nome: el.tags.name,
       endereco: [el.tags['addr:street'], el.tags['addr:housenumber'], el.tags['addr:suburb']].filter(Boolean).join(', ') || "Endereço não informado no OSM",
       telefone: el.tags.phone || el.tags['contact:phone'] || null
     }));
+}
+
+async function buscarLeadsReais(categoria, cidade){
+  const { lat, lon } = await geocodificarCidade(cidade);
+  const tags = osmTagPorCategoria[categoria] || ['shop'];
+
+  // Fase 1 — busca rápida e leve, só em "node" (onde está a grande maioria
+  // dos comércios mapeados no Brasil). Precisa funcionar de forma confiável.
+  const nodeFiltros = tags.map(t=>{
+    const [k,v] = t.split('=');
+    return `node["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});`;
+  }).join("");
+  const elementosNode = await consultarOverpass(
+    `[out:json][timeout:15];(${nodeFiltros});out center 40;`, 9000
+  );
+
+  // Fase 2 — complementa com "way"/"relation" (comércios mapeados como
+  // edificação), que são mais lentos de calcular. É best-effort, tentando
+  // só nos 3 primeiros espelhos e com prazo curto: se travar ou falhar,
+  // mantém os resultados da fase 1 e segue em frente sem travar a busca.
+  let elementosWR = [];
+  try{
+    const wrFiltros = tags.map(t=>{
+      const [k,v] = t.split('=');
+      return `way["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});relation["${k}"="${v}"](around:${RAIO_BUSCA_METROS},${lat},${lon});`;
+    }).join("");
+    elementosWR = await consultarOverpass(
+      `[out:json][timeout:20];(${wrFiltros});out center 40;`, 12000, OVERPASS_MIRRORS.slice(0, 3)
+    );
+  }catch(e){
+    console.warn("Complemento way/relation indisponível, seguindo só com nodes:", e.message);
+  }
+
+  return extrairLeads([...elementosNode, ...elementosWR]).slice(0, 18);
 }
 
 document.getElementById('filtrarBtn').addEventListener('click', filtrarLeads);
@@ -1028,40 +1140,132 @@ function buscar(){
 document.getElementById('gerarBtn').addEventListener('click', gerar);
 document.getElementById('regenBtn').addEventListener('click', gerar);
 document.getElementById('downloadBtn').addEventListener('click', baixar);
+document.getElementById('fullscreenBtn').addEventListener('click', verEmTelaCheia);
+
+// CSS do site gerado (montarSite()) — precisa ir embutido no HTML
+// exportado/aberto em nova aba, já que ali ele não herda mais o <style>
+// da página do gerador. Mantém as mesmas regras usadas na prévia.
+const CSS_SITE_GERADO = `
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;color:#161513;line-height:1.5}
+  :root{--red:#E5241E;--ink-soft:#5c5954;--line:#DEDAD1;--pink-bg:#FDEEEC}
+  .site-hero{position:relative;min-height:640px;color:#fff;background:#0e0e0e;overflow:hidden;display:flex;flex-direction:column}
+  .hero-watermark{position:absolute;top:50%;left:50%;transform:translate(-50%,-52%) rotate(-6deg);font-size:min(22vw,260px);font-weight:800;color:rgba(255,255,255,.045);white-space:nowrap;pointer-events:none;letter-spacing:.02em;z-index:0;text-transform:uppercase}
+  .site-nav{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;padding:26px 44px;gap:16px;flex-wrap:wrap}
+  .site-nav .brandname{font-size:17px;letter-spacing:.06em;font-weight:700}
+  .site-nav .links{display:flex;gap:26px;font-size:13px;opacity:.9}
+  .site-nav .links span{cursor:pointer;padding-bottom:4px}
+  .site-nav .links span.active{border-bottom:2px solid var(--gold,var(--red))}
+  .site-nav .pin{font-size:12px;opacity:.75;display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .site-nav .cta-pill{background:var(--gold,var(--red));color:#fff;border:none;padding:10px 20px;border-radius:20px;font-size:12.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .hero-flex{position:relative;z-index:1;flex:1;display:flex;align-items:center;gap:36px;padding:20px 44px 44px;flex-wrap:wrap}
+  .hero-left{flex:1 1 380px;max-width:560px}
+  .hero-kicker{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;opacity:.65;line-height:1.7;margin-bottom:20px}
+  .hero-kicker::after{content:"";display:block;width:38px;height:2px;background:var(--gold,var(--red));margin-top:12px}
+  .hero-title{font-size:clamp(36px,6vw,64px);line-height:1.05;font-weight:800;margin:0 0 20px;letter-spacing:-.01em}
+  .hero-title em{display:block;font-style:italic;color:var(--gold,var(--red));font-weight:800}
+  .hero-tagline{font-size:12px;letter-spacing:.09em;text-transform:uppercase;opacity:.7;line-height:1.8;margin:0 0 30px;max-width:400px}
+  .hero-cta{background:var(--gold,var(--red));color:#fff;border:none;padding:15px 30px;border-radius:28px;font-weight:700;font-size:14px;cursor:default}
+  .hero-right{flex:1 1 280px;position:relative;display:flex;align-items:center;justify-content:center;min-height:320px}
+  .hero-blob{position:absolute;width:82%;aspect-ratio:1/1;border-radius:50%;background:radial-gradient(circle at 34% 28%,var(--gold,var(--red)),color-mix(in srgb,var(--gold,var(--red)) 30%,black) 78%)}
+  .hero-photo{position:relative;width:70%;aspect-ratio:1/1;object-fit:cover;border-radius:50%;box-shadow:0 30px 70px rgba(0,0,0,.55);z-index:1;background:var(--pink-bg)}
+  .site-feats{position:relative;z-index:1;display:flex;gap:26px;padding:20px 44px 26px;font-size:12px;opacity:.85;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.08)}
+  .site-section{padding:52px 44px;border-top:1px solid var(--line)}
+  .site-section h3{font-size:20px;margin-bottom:14px;font-weight:700}
+  .site-section p{font-size:14.5px;color:var(--ink-soft);line-height:1.65}
+  .servicos{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:18px}
+  .servico{background:var(--pink-bg);padding:18px;border-radius:10px;font-size:13.5px;font-weight:600}
+  .galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:22px}
+  .galeria img{width:100%;height:150px;object-fit:cover;border-radius:10px;display:block;background:#eee}
+  .depoimento{padding:52px 44px;border-top:1px solid var(--line);background:var(--pink-bg)}
+  .depoimento p{font-size:18px;font-style:italic;max-width:600px;line-height:1.5}
+  .depoimento span{font-size:12.5px;color:var(--ink-soft);display:block;margin-top:12px}
+  .site-contato{padding:52px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
+  .site-contato .cta-final{background:var(--red);color:#fff;padding:12px 26px;border-radius:22px;font-size:13.5px;cursor:pointer;border:none;font-weight:700}
+  .site-footer{padding:24px 44px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-soft);flex-wrap:wrap;gap:8px}
+  .anim-on .hero-kicker,.anim-on .hero-title,.anim-on .hero-tagline,.anim-on .hero-cta{animation:riseIn .7s ease both}
+  .anim-on .hero-title{animation-delay:.08s}
+  .anim-on .hero-tagline{animation-delay:.16s}
+  .anim-on .hero-cta{animation-delay:.24s}
+  .anim-on .hero-photo{animation:riseIn .8s ease .1s both}
+  .anim-on .servico{animation:riseIn .5s ease both}
+  @keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:760px){
+    .hero-flex{flex-direction:column;text-align:center}
+    .hero-kicker::after{margin:12px auto 0}
+    .hero-right{margin-top:10px}
+  }
+  @media(max-width:600px){
+    .site-nav .links,.site-nav .pin{display:none}
+  }
+`;
+
+function montarHtmlCompleto(){
+  const nomeEmpresa = document.getElementById('nome').value.trim() || 'site-gerado';
+  return `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(nomeEmpresa)}</title><style>${CSS_SITE_GERADO}</style></head><body>${siteHtmlFinal}</body></html>`;
+}
+
+function verEmTelaCheia(){
+  if(!siteHtmlFinal) return;
+  const blob = new Blob([montarHtmlCompleto()], {type:"text/html"});
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank', 'noopener');
+}
 
 function escolher(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 function capitalizar(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; }
 
-function classificarRamo(ramo){
-  const r = (ramo||'').toLowerCase();
-  const premium = ['clínica','advocacia','imobiliária','imoveis','odontológica','odontologia','arquitetura','consultoria','médic'];
-  const media = ['restaurante','academia','pet','salão','barbearia','oficina'];
-  if(premium.some(p=>r.includes(p))) return 'premium';
-  if(media.some(p=>r.includes(p))) return 'media';
+// Compara por palavra inteira (não por substring), para "bar" não bater com
+// "barbearia", "pet" não bater com "petiscaria", etc.
+function contemPalavra(texto, palavras){
+  const t = (texto||'').toLowerCase();
+  return palavras.some(p => new RegExp('\\b' + p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&') + '\\b', 'i').test(t));
+}
+
+// Classifica o ramo para escolher um CTA e um vocabulário coerentes
+// (pedir comida, agendar horário, ou pedir orçamento/contato).
+function categoriaNegocio(ramo){
+  const comida = ['restaurante','padaria','lanchonete','pizzaria','hamburgueria','açaí','acai','sorveteria','cafeteria','confeitaria','bar','doceria','churrascaria','food truck','marmita','buffet','açougue','peixaria','hortifruti','mercearia'];
+  const agenda = ['clínica','consultório','odontológica','odontologia','salão','barbearia','estética','academia','pet','veterinária','fisioterapia','psicologia','nutricionista','massagem','spa','tatuagem','yoga','pilates','dança','autoescola','depilação','sobrancelha'];
+  if(contemPalavra(ramo, comida)) return 'comida';
+  if(contemPalavra(ramo, agenda)) return 'agenda';
   return 'padrao';
+}
+
+// Primeira palavra do ramo, capitalizada — vira o título gigante do hero
+// (ex.: "padaria artesanal" → "Padaria").
+function ramoCurto(ramo){
+  const primeira = (ramo||'negócio').trim().split(/\s+/)[0] || 'negócio';
+  return capitalizar(primeira.toLowerCase());
 }
 
 // Gera o conteúdo de copywriting do site inteiramente no navegador — sem
 // depender de nenhuma API externa de IA (que exigiria chave secreta e nunca
 // funcionaria a partir do navegador). Sempre entrega um resultado profissional.
 function gerarCopyLocal(nome, ramo, cidade, obs, aprimorado){
-  const ramoCap = capitalizar(ramo || 'negócio');
   const ramoLower = (ramo || 'negócio').toLowerCase();
   const local = cidade ? ` em ${cidade}` : '';
-  const tipo = classificarRamo(ramo);
+  const categoria = categoriaNegocio(ramo);
 
-  const paresHeadline = {
-    premium: [["Excelência e cuidado", "em cada detalhe"], ["Confiança que", "você pode sentir"], ["Tradição e resultado", "lado a lado"]],
-    media: [["Qualidade que", "você percebe na hora"], ["Atendimento de verdade", "do começo ao fim"], ["Feito para", "durar e satisfazer"]],
-    padrao: [["Perto de você", "e pronto pra ajudar"], ["Feito com cuidado", "em cada detalhe"], ["Qualidade e atenção", "em primeiro lugar"]]
+  // Título gigante no estilo "[Ramo] que [verbo]" (ex.: "Ramen que conecta").
+  const headline = ramoCurto(ramo);
+  const verbos = {
+    comida: ["conecta","encanta","surpreende","alimenta com carinho"],
+    agenda: ["cuida de você","transforma","inspira confiança","acolhe"],
+    padrao: ["conecta","transforma","surpreende","aproxima"]
   };
-  const [headline, headlineDestaque] = escolher(paresHeadline[tipo]);
+  const headlineDestaque = `que ${escolher(verbos[categoria])}`;
 
-  const subheadline = escolher([
-    `${ramoCap} de referência${local}, com atendimento próximo e resultado que você sente.`,
-    `${nome} une experiência e cuidado para entregar o melhor em ${ramoLower}${local}.`,
-    `Referência em ${ramoLower}${local}, com atendimento atencioso do início ao fim.`
-  ]);
+  // Frase pequena (olho/eyebrow) acima do título.
+  const unidade = { comida: ["prato","sabor","receita"], agenda: ["atendimento","consulta","sessão"], padrao: ["detalhe","trabalho","projeto"] }[categoria];
+  const kicker = `${escolher(["Tradição e cuidado","Qualidade e capricho","Excelência e atenção","Dedicação de verdade"])} em cada ${escolher(unidade)}`;
+
+  // Tagline curta em caixa alta, logo abaixo do título.
+  const subheadline = escolher({
+    comida: ["Mais que uma refeição, uma experiência.", "Sabor de verdade, em cada prato.", "Feito com cuidado, do preparo à mesa."],
+    agenda: ["Mais que um atendimento, um cuidado.", "Sua confiança em primeiro lugar.", "Atenção de verdade, em cada visita."],
+    padrao: ["Mais que um serviço, uma experiência.", "Qualidade que você sente na hora.", "Cuidado de verdade, do início ao fim."]
+  }[categoria]);
 
   const sobreExtra = obs ? ` ${obs}.` : '';
   const sobre = aprimorado
@@ -1077,8 +1281,13 @@ function gerarCopyLocal(nome, ramo, cidade, obs, aprimorado){
   const bancoFeats = ["Atendimento ágil","Profissionais qualificados","Preço justo","Localização estratégica","Anos de experiência","Clientes satisfeitos","Equipe capacitada","Horário flexível","Atendimento humanizado","Estrutura completa"];
   const feats = [...bancoFeats].sort(()=>Math.random()-0.5).slice(0,4);
 
-  const cta = escolher(["Fale conosco agora","Agende seu horário","Peça um orçamento","Entre em contato"]);
-  const navLinks = ["Início","Serviços","Contato"];
+  const ctaPorCategoria = {
+    comida: ["Fazer pedido","Ver cardápio","Peça já"],
+    agenda: ["Agendar horário","Marcar consulta","Reservar horário"],
+    padrao: ["Fale conosco","Solicitar orçamento","Entre em contato"]
+  };
+  const cta = escolher(ctaPorCategoria[categoria]);
+  const navLinks = ["Início","Serviços","Sobre nós","Contato"];
 
   const depoimento = aprimorado
     ? escolher([
@@ -1093,7 +1302,7 @@ function gerarCopyLocal(nome, ramo, cidade, obs, aprimorado){
       ]);
   const depoimentoAutor = `${escolher(["Fernanda M.","Carlos R.","Juliana S.","Marcos P.","Beatriz L.","André T."])}${cidade ? ', ' + cidade : ''}`;
 
-  return { headline, headlineDestaque, subheadline, sobre, servicos, cta, navLinks, feats, depoimento, depoimentoAutor };
+  return { headline, headlineDestaque, kicker, subheadline, sobre, servicos, cta, navLinks, feats, depoimento, depoimentoAutor };
 }
 
 async function gerar(){
@@ -1123,15 +1332,16 @@ async function gerar(){
   try{
     const copy = gerarCopyLocal(nome, ramo, cidade, obs, aprimorado);
 
-    status.textContent = "Buscando fotos reais (Pexels)...";
+    status.textContent = "Gerando imagens realistas com IA...";
     const termoFoto = cidade ? `${ramo} ${cidade}` : ramo;
-    // 1 foto de capa + 4 fotos de galeria: site sempre sai com imagens reais.
-    const fotos = await buscarFotosPexels(termoFoto, 5);
+    // 1 foto de capa + 8 fotos de galeria: o site sempre sai com bastante
+    // imagem, fotorrealista (IA) ou real (Pexels), nunca só uma foto solitária.
+    const fotos = await buscarImagensSite(termoFoto, ramo, 9);
     const heroImg = fotos[0];
-    const galeria = fotos.slice(1, 5);
+    const galeria = fotos.slice(1, 9);
     const animado = document.getElementById('animado').checked;
 
-    siteHtmlFinal = montarSite(nome, corSelecionada, copy, heroImg, ramo, galeria, animado);
+    siteHtmlFinal = montarSite(nome, corSelecionada, copy, heroImg, ramo, galeria, animado, cidade);
     document.getElementById('preview').innerHTML = siteHtmlFinal;
     document.getElementById('toolbar').style.display = 'flex';
     mostrarSugestaoPreco(ramo);
@@ -1152,48 +1362,54 @@ async function gerar(){
 }
 
 function mostrarSugestaoPreco(ramo){
-  const r = ramo.toLowerCase();
   let min = 300, max = 600;
-  const premium = ['clínica','advocacia','imobiliária','imoveis','odontológica','odontologia','arquitetura','consultoria','médic'];
+  const premium = ['clínica','advocacia','imobiliária','imoveis','odontológica','odontologia','arquitetura','consultoria','médico','médica'];
   const media = ['restaurante','academia','pet','salão','barbearia','oficina'];
-  if(premium.some(p=>r.includes(p))){ min=700; max=1500; }
-  else if(media.some(p=>r.includes(p))){ min=450; max=900; }
+  if(contemPalavra(ramo, premium)){ min=700; max=1500; }
+  else if(contemPalavra(ramo, media)){ min=450; max=900; }
   const sugestao = Math.round((min+max)/2/10)*10;
   document.getElementById('precoSugestao').style.display = 'block';
   document.getElementById('precoValor').textContent = 'R$ '+sugestao;
   document.getElementById('precoFaixa').textContent = `Faixa de mercado: R$ ${min} a R$ ${max}`;
 }
 
-function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado){
+function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado, cidade){
   const nomeSeguro = esc(nome);
   const ramoSeguro = esc(ramo);
   const servicosHtml = copy.servicos.map(s=>`<div class="servico">${esc(s)}</div>`).join("");
-  const navHtml = (copy.navLinks||["Início","Serviços","Contato"]).map((l,i)=>`<span onclick="document.getElementById('gsec${i}').scrollIntoView({behavior:'smooth'})">${esc(l)}</span>`).join("");
+  // gsec0=Início(hero) · gsec1=Sobre nós · gsec2=Serviços · gsec3=Contato
+  const navHtml = (copy.navLinks||["Início","Sobre nós","Serviços","Contato"]).map((l,i)=>`<span class="${i===0?'active':''}" onclick="document.getElementById('gsec${i}').scrollIntoView({behavior:'smooth'})">${esc(l)}</span>`).join("");
   const featsHtml = (copy.feats||[]).map(f=>`<span>${esc(f)}</span>`).join("");
   const galHtml = (galeria||[]).map(g=>`<img src="${esc(g)}" alt="${ramoSeguro}" loading="lazy" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${encodeURIComponent(ramo)}fallback/800/600'">`).join("");
   return `
     <div class="${animado?'anim-on':''}">
     <div class="site-hero" id="gsec0" style="--gold:${cor}">
-      <img src="${esc(heroImg)}" alt="${ramoSeguro}" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${encodeURIComponent(ramo)}hero/1200/600'">
-      <div class="overlay">
-        <div class="site-nav">
-          <div class="brandname">${nomeSeguro.toUpperCase()}</div>
-          <div class="links">${navHtml}</div>
-          <div class="cta-pill" onclick="document.getElementById('gsec2').scrollIntoView({behavior:'smooth'})">Fale conosco</div>
-        </div>
-        <div class="site-hero-body">
-          <h2>${esc(copy.headline)}<br><em>${esc(copy.headlineDestaque||"")}</em></h2>
-          <p>${esc(copy.subheadline)}</p>
-          <button style="background:${cor}">${esc(copy.cta)}</button>
-        </div>
-        <div class="site-feats">${featsHtml}</div>
+      <div class="hero-watermark">${ramoSeguro}</div>
+      <div class="site-nav">
+        <div class="brandname">${nomeSeguro.toUpperCase()}</div>
+        <div class="links">${navHtml}</div>
+        ${cidade ? `<div class="pin">📍 ${esc(cidade)}</div>` : ''}
+        <div class="cta-pill" onclick="document.getElementById('gsec3').scrollIntoView({behavior:'smooth'})">${esc(copy.cta)} →</div>
       </div>
+      <div class="hero-flex">
+        <div class="hero-left">
+          <div class="hero-kicker">${esc(copy.kicker||'')}</div>
+          <h2 class="hero-title">${esc(copy.headline)}<br><em>${esc(copy.headlineDestaque||"")}</em></h2>
+          <p class="hero-tagline">${esc(copy.subheadline)}</p>
+          <button class="hero-cta">${esc(copy.cta)} →</button>
+        </div>
+        <div class="hero-right">
+          <div class="hero-blob"></div>
+          <img class="hero-photo" src="${esc(heroImg)}" alt="${ramoSeguro}" loading="lazy" onerror="this.onerror=null;this.src='https://picsum.photos/seed/${encodeURIComponent(ramo)}hero/800/800'">
+        </div>
+      </div>
+      <div class="site-feats">${featsHtml}</div>
     </div>
-    <div class="site-section">
+    <div class="site-section" id="gsec1">
       <h3>Sobre ${nomeSeguro}</h3>
       <p>${esc(copy.sobre)}</p>
     </div>
-    <div class="site-section" id="gsec1">
+    <div class="site-section" id="gsec2">
       <h3>Serviços</h3>
       <div class="servicos">${servicosHtml}</div>
       <div class="galeria">${galHtml}</div>
@@ -1202,7 +1418,7 @@ function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado){
       <p>"${esc(copy.depoimento||'')}"</p>
       <span>${esc(copy.depoimentoAutor||'')}</span>
     </div>
-    <div class="site-contato" id="gsec2">
+    <div class="site-contato" id="gsec3">
       <div>
         <h3 style="font-size:18px;margin-bottom:6px">Vamos conversar?</h3>
         <p style="font-size:13px;color:var(--ink-soft);margin:0">${ramoSeguro} em ${nomeSeguro}</p>
@@ -1219,8 +1435,7 @@ function montarSite(nome, cor, copy, heroImg, ramo, galeria, animado){
 
 function baixar(){
   const nomeEmpresa = document.getElementById('nome').value.trim() || 'site-gerado';
-  const full = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${esc(nomeEmpresa)}</title></head><body style="margin:0;font-family:-apple-system,'Helvetica Neue',Arial,sans-serif">${siteHtmlFinal}</body></html>`;
-  const blob = new Blob([full], {type:"text/html"});
+  const blob = new Blob([montarHtmlCompleto()], {type:"text/html"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
