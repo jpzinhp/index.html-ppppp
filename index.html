@@ -768,8 +768,8 @@ const osmTagPorCategoria = {
   "Tatuagem e piercing":['shop=tattoo'],
   "Spas e day spas":['amenity=spa'],
   "Depilação e design de sobrancelhas":['shop=beauty'],
-  "Clínicas e consultórios médicos":['amenity=clinic','amenity=doctors'],
-  "Clínicas odontológicas":['amenity=dentist'],
+  "Clínicas e consultórios médicos":['amenity=clinic','amenity=doctors','healthcare=clinic','healthcare=doctor','healthcare=centre'],
+  "Clínicas odontológicas":['amenity=dentist','healthcare=dentist'],
   "Fisioterapia e pilates":['healthcare=physiotherapist'],
   "Psicologia e terapia":['healthcare=psychotherapist'],
   "Nutricionistas":['healthcare=nutritionist'],
@@ -901,7 +901,7 @@ const OVERPASS_MIRRORS = [
   "https://lz4.overpass-api.de/api/interpreter",
   "https://z.overpass-api.de/api/interpreter"
 ];
-const RAIO_BUSCA_METROS = 10000;
+const RAIO_BUSCA_METROS = 15000;
 
 function temSiteCadastrado(tags){
   return !!(tags.website || tags['contact:website'] || tags.url || tags['website:menu']);
@@ -926,21 +926,33 @@ async function consultarOverpass(query, timeoutMs, mirrors = OVERPASS_MIRRORS){
   throw new Error("Todos os servidores do OpenStreetMap falharam: " + todosErros.join(" | "));
 }
 
+// Além dos leads (sem site), calcula quantos comércios nomeados foram
+// encontrados no total — para diferenciar "não achei nada aqui" (provável
+// falta de cobertura do OSM) de "achei vários, mas todos já têm site"
+// (a busca funcionou, só não sobrou lead nessa categoria/região).
 function extrairLeads(elementos){
-  const vistos = new Set();
-  return (elementos||[])
-    .filter(el => el.tags && el.tags.name && !temSiteCadastrado(el.tags))
-    .filter(el => {
-      const chave = (el.tags.name + '|' + (el.tags['addr:street']||'')).toLowerCase();
-      if(vistos.has(chave)) return false;
-      vistos.add(chave);
-      return true;
-    })
-    .map(el => ({
+  const vistosTotal = new Set();
+  const vistosSemSite = new Set();
+  let totalNomeados = 0;
+  const leads = [];
+
+  for(const el of (elementos||[])){
+    if(!el.tags || !el.tags.name) continue;
+    const chave = (el.tags.name + '|' + (el.tags['addr:street']||'')).toLowerCase();
+    if(!vistosTotal.has(chave)){
+      vistosTotal.add(chave);
+      totalNomeados++;
+    }
+    if(temSiteCadastrado(el.tags) || vistosSemSite.has(chave)) continue;
+    vistosSemSite.add(chave);
+    leads.push({
       nome: el.tags.name,
       endereco: [el.tags['addr:street'], el.tags['addr:housenumber'], el.tags['addr:suburb']].filter(Boolean).join(', ') || "Endereço não informado no OSM",
       telefone: el.tags.phone || el.tags['contact:phone'] || null
-    }));
+    });
+  }
+
+  return { leads, totalNomeados };
 }
 
 async function buscarLeadsReais(categoria, cidade){
@@ -974,7 +986,8 @@ async function buscarLeadsReais(categoria, cidade){
     console.warn("Complemento way/relation indisponível, seguindo só com nodes:", e.message);
   }
 
-  return extrairLeads([...elementosNode, ...elementosWR]).slice(0, 18);
+  const { leads, totalNomeados } = extrairLeads([...elementosNode, ...elementosWR]);
+  return { leads: leads.slice(0, 18), totalNomeados };
 }
 
 document.getElementById('filtrarBtn').addEventListener('click', filtrarLeads);
@@ -1086,9 +1099,11 @@ async function filtrarLeads(){
   hint.textContent = "🔎 Buscando dados reais no OpenStreetMap em todo o Brasil...";
   lista.innerHTML = "";
   try{
-    const leads = await buscarLeadsReais(cat, cidade);
+    const { leads, totalNomeados } = await buscarLeadsReais(cat, cidade);
     if(leads.length === 0){
-      hint.textContent = `Nenhum "${cat}" sem site cadastrado no OpenStreetMap para ${cidade}. Tente outra cidade ou categoria — a cobertura do OSM varia por região.`;
+      hint.textContent = totalNomeados > 0
+        ? `Encontrei ${totalNomeados} comércio(s) de "${cat}" no OpenStreetMap para ${cidade}, mas todos já têm site cadastrado. Tente outra categoria ou cidade.`
+        : `Nenhum "${cat}" encontrado no OpenStreetMap para ${cidade} (com ou sem site). A cobertura do OSM para essa categoria pode ser menor por aqui — tente uma cidade maior, outra categoria, ou aumente a área digitando um bairro específico.`;
       return;
     }
     const fotos = await buscarFotosPexels(cat, leads.length);
@@ -1100,7 +1115,7 @@ async function filtrarLeads(){
       div.addEventListener('click', ()=> abrirLeadModal({nome:l.nome, endereco:l.endereco, telefone:l.telefone, categoria:cat, cidade}));
       lista.appendChild(div);
     });
-    hint.textContent = `${leads.length} comércios reais encontrados em ${cidade} (dados OpenStreetMap, sem site cadastrado).`;
+    hint.textContent = `${leads.length} de ${totalNomeados} comércios de "${cat}" encontrados em ${cidade} estão sem site cadastrado (dados OpenStreetMap).`;
   }catch(e){
     console.error(e);
     renderizarLeadsExemplo(cat, cidade, lista, hint, e.message);
