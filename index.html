@@ -845,6 +845,21 @@ const osmTagPorCategoria = {
 // brasileiras com homônimas em outros países e mantém a busca precisa).
 const BRASIL_BBOX = "-74.0,-34.0,-32.0,6.0"; // minLon,minLat,maxLon,maxLat
 
+const UFS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+
+// Texto livre tipo "São Paulo SP" é ambíguo para o geocodificador (pode
+// resolver para o ESTADO inteiro, cujo centro fica longe da capital, em
+// vez da cidade). Reformata com vírgulas ("São Paulo, SP, Brasil"), que o
+// Nominatim interpreta de forma muito mais confiável.
+function normalizarConsultaLocal(texto){
+  const limpo = texto.trim();
+  const m = limpo.match(/^(.+?)[\s,\-]+([A-Za-z]{2})$/);
+  if(m && UFS_BRASIL.includes(m[2].toUpperCase())){
+    return `${m[1].trim()}, ${m[2].toUpperCase()}, Brasil`;
+  }
+  return /brasil|brazil/i.test(limpo) ? limpo : `${limpo}, Brasil`;
+}
+
 function fetchComTimeout(url, opts = {}, timeoutMs = 12000){
   const signal = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout)
     ? AbortSignal.timeout(timeoutMs)
@@ -852,19 +867,26 @@ function fetchComTimeout(url, opts = {}, timeoutMs = 12000){
   return fetch(url, signal ? { ...opts, signal } : opts);
 }
 
-async function geocodificarCidade(cidade){
+async function geocodificarCidade(cidadeOriginal){
+  const cidade = normalizarConsultaLocal(cidadeOriginal);
   // 1) Nominatim, restrito ao Brasil (countrycodes=br) — mais preciso para
-  //    cidades, bairros e endereços em qualquer estado do país.
+  //    cidades, bairros e endereços em qualquer estado do país. Pede mais
+  //    de 1 resultado e prioriza cidade/vila/bairro sobre estado inteiro,
+  //    pra não confundir "São Paulo, SP" (cidade) com o estado de SP.
   try{
-    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=br&accept-language=pt-BR&limit=1&q=${encodeURIComponent(cidade)}`;
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=br&accept-language=pt-BR&limit=5&q=${encodeURIComponent(cidade)}`;
     const resp = await fetchComTimeout(url);
     if(resp.ok){
       const data = await resp.json();
-      if(data && data[0]){
+      // Evita pegar o resultado "estado inteiro" (type=administrative,
+      // ligado a um limite territorial) quando existe um resultado mais
+      // específico de cidade/vila/bairro na mesma resposta.
+      const melhor = (data||[]).find(d => d.type !== 'administrative') || (data && data[0]);
+      if(melhor){
         return {
-          lat: parseFloat(data[0].lat),
-          lon: parseFloat(data[0].lon),
-          nomeExibicao: data[0].display_name
+          lat: parseFloat(melhor.lat),
+          lon: parseFloat(melhor.lon),
+          nomeExibicao: melhor.display_name
         };
       }
     }
@@ -881,7 +903,7 @@ async function geocodificarCidade(cidade){
       const feat = data && data.features && data.features[0];
       if(feat){
         const [lon, lat] = feat.geometry.coordinates;
-        return { lat, lon, nomeExibicao: cidade };
+        return { lat, lon, nomeExibicao: cidadeOriginal };
       }
     }
   }catch(e){
@@ -956,7 +978,7 @@ function extrairLeads(elementos){
 }
 
 async function buscarLeadsReais(categoria, cidade){
-  const { lat, lon } = await geocodificarCidade(cidade);
+  const { lat, lon, nomeExibicao } = await geocodificarCidade(cidade);
   const tags = osmTagPorCategoria[categoria] || ['shop'];
 
   // Fase 1 — busca rápida e leve, só em "node" (onde está a grande maioria
@@ -987,7 +1009,7 @@ async function buscarLeadsReais(categoria, cidade){
   }
 
   const { leads, totalNomeados } = extrairLeads([...elementosNode, ...elementosWR]);
-  return { leads: leads.slice(0, 18), totalNomeados };
+  return { leads: leads.slice(0, 18), totalNomeados, nomeExibicao };
 }
 
 document.getElementById('filtrarBtn').addEventListener('click', filtrarLeads);
@@ -1099,11 +1121,13 @@ async function filtrarLeads(){
   hint.textContent = "🔎 Buscando dados reais no OpenStreetMap em todo o Brasil...";
   lista.innerHTML = "";
   try{
-    const { leads, totalNomeados } = await buscarLeadsReais(cat, cidade);
+    const { leads, totalNomeados, nomeExibicao } = await buscarLeadsReais(cat, cidade);
+    const ondeBuscou = nomeExibicao ? ` Busca feita perto de: ${nomeExibicao}.` : '';
     if(leads.length === 0){
-      hint.textContent = totalNomeados > 0
+      hint.textContent = (totalNomeados > 0
         ? `Encontrei ${totalNomeados} comércio(s) de "${cat}" no OpenStreetMap para ${cidade}, mas todos já têm site cadastrado. Tente outra categoria ou cidade.`
-        : `Nenhum "${cat}" encontrado no OpenStreetMap para ${cidade} (com ou sem site). A cobertura do OSM para essa categoria pode ser menor por aqui — tente uma cidade maior, outra categoria, ou aumente a área digitando um bairro específico.`;
+        : `Nenhum "${cat}" encontrado no OpenStreetMap para ${cidade} (com ou sem site). A cobertura do OSM para essa categoria pode ser menor por aqui — tente uma cidade maior, outra categoria, ou aumente a área digitando um bairro específico.`)
+        + ondeBuscou;
       return;
     }
     const fotos = await buscarFotosPexels(cat, leads.length);
@@ -1115,7 +1139,7 @@ async function filtrarLeads(){
       div.addEventListener('click', ()=> abrirLeadModal({nome:l.nome, endereco:l.endereco, telefone:l.telefone, categoria:cat, cidade}));
       lista.appendChild(div);
     });
-    hint.textContent = `${leads.length} de ${totalNomeados} comércios de "${cat}" encontrados em ${cidade} estão sem site cadastrado (dados OpenStreetMap).`;
+    hint.textContent = `${leads.length} de ${totalNomeados} comércios de "${cat}" encontrados em ${cidade} estão sem site cadastrado (dados OpenStreetMap).${ondeBuscou}`;
   }catch(e){
     console.error(e);
     renderizarLeadsExemplo(cat, cidade, lista, hint, e.message);
