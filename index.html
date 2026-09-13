@@ -449,7 +449,7 @@
 
     <div style="font-size:11.5px;font-weight:800;color:var(--red);letter-spacing:.03em;margin-bottom:8px">O SITE GERADO INCLUI</div>
     <div style="display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px">
-      <span style="font-size:13px">✅ <b>Fotos reais do ramo do negócio</b><br><span style="color:var(--ink-soft);font-size:12px">Buscadas automaticamente em banco de imagens real, no topo e na galeria.</span></span>
+      <span style="font-size:13px">✅ <b>Fotos fotorrealistas do ramo do negócio</b><br><span style="color:var(--ink-soft);font-size:12px">Geradas por IA em estilo fotográfico realista (com fotos reais como alternativa), no topo e na galeria.</span></span>
     </div>
     <label style="display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:18px;cursor:pointer">
       <input type="checkbox" id="extraOpus" checked style="margin-top:3px">
@@ -604,6 +604,60 @@ async function buscarFotosPexels(query, quantidade){
     }
     return fallback;
   }
+}
+
+// --- Imagens geradas por IA, com aparência fotorrealista ---
+// Usa o Pollinations (gratuito, sem chave/cadastro) com um modelo voltado
+// a fotorrealismo. Os prompts pedem explicitamente "foto real" e evitam
+// termos de ilustração/arte, para o resultado parecer uma fotografia de
+// verdade em vez de uma arte estilizada.
+// Prompts em inglês (os modelos de geração de imagem produzem resultados
+// bem mais realistas com termos em inglês) — só o ramo do negócio em si
+// fica em português, exatamente como o usuário digitou.
+const ANGULOS_FOTO_IA = ["wide interior view", "storefront and entrance", "staff serving a customer", "close-up of the space and equipment"];
+
+function promptFotoIA(ramo, indice){
+  const estilo = escolher([
+    "professional DSLR photography, natural light",
+    "editorial magazine photography, high definition",
+    "realistic commercial photography, sharp focus, 35mm lens"
+  ]);
+  const angulo = ANGULOS_FOTO_IA[indice % ANGULOS_FOTO_IA.length];
+  return `${estilo}, real photo of a ${ramo} business in Brazil, ${angulo}, modern and clean environment, natural colors, ultra detailed, 4k, photorealistic, no text, no logo, no watermark, not an illustration, not a drawing, not a painting`;
+}
+
+function urlFotoIA(ramo, indice, w, h){
+  const seed = Math.floor(Math.random()*1000000) + indice;
+  const prompt = encodeURIComponent(promptFotoIA(ramo, indice));
+  return `https://image.pollinations.ai/prompt/${prompt}?width=${w}&height=${h}&seed=${seed}&nologo=true&model=flux-realism`;
+}
+
+// Testa rapidamente se o gerador de imagens por IA está respondendo antes
+// de montar a galeria toda com ele — se estiver fora do ar, usamos fotos
+// reais (Pexels/Picsum) no lugar, sem travar nem quebrar a geração.
+async function iaDeImagensDisponivel(){
+  try{
+    const testUrl = `https://image.pollinations.ai/prompt/teste?width=64&height=64&nologo=true`;
+    const resp = await fetch(testUrl, {
+      signal: (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) ? AbortSignal.timeout(9000) : undefined
+    });
+    return resp.ok;
+  }catch(e){
+    console.warn("Gerador de imagens por IA indisponível agora, usando fotos reais como alternativa:", e.message);
+    return false;
+  }
+}
+
+async function buscarImagensSite(termoFoto, ramo, quantidade){
+  const disponivel = await iaDeImagensDisponivel();
+  if(disponivel){
+    const urls = [];
+    for(let i=0;i<quantidade;i++){
+      urls.push(urlFotoIA(ramo, i, i===0?1200:800, i===0?800:600));
+    }
+    return urls;
+  }
+  return buscarFotosPexels(termoFoto, quantidade);
 }
 
 function irParaLeads(){
@@ -1278,11 +1332,11 @@ async function gerar(){
   try{
     const copy = gerarCopyLocal(nome, ramo, cidade, obs, aprimorado);
 
-    status.textContent = "Buscando fotos reais (Pexels)...";
+    status.textContent = "Gerando imagens realistas com IA...";
     const termoFoto = cidade ? `${ramo} ${cidade}` : ramo;
     // 1 foto de capa + 8 fotos de galeria: o site sempre sai com bastante
-    // imagem real (nunca só uma foto solitária).
-    const fotos = await buscarFotosPexels(termoFoto, 9);
+    // imagem, fotorrealista (IA) ou real (Pexels), nunca só uma foto solitária.
+    const fotos = await buscarImagensSite(termoFoto, ramo, 9);
     const heroImg = fotos[0];
     const galeria = fotos.slice(1, 9);
     const animado = document.getElementById('animado').checked;
