@@ -878,6 +878,55 @@ function formatarConsultaLivre(texto){
   return /brasil|brazil/i.test(limpo) ? limpo : `${limpo}, Brasil`;
 }
 
+// Coordenadas fixas das 27 capitais — não dependem de nenhuma API externa.
+// Motivo: já vimos o Nominatim (mesmo com busca estruturada city=/state=)
+// resolver "São Paulo, SP" para o ESTADO e até para a REGIÃO Sudeste
+// inteira (5 estados!) em produção real. Como não há como testar o
+// comportamento exato da API a partir daqui, a forma confiável de garantir
+// que a cidade certa é usada — pelo menos para as capitais, os casos mais
+// comuns e mais testados — é não depender da geocodificação externa nesse
+// caso e usar coordenadas conhecidas diretamente.
+const CAPITAIS_BRASIL = {
+  AC:{nome:'Rio Branco',lat:-9.9750,lon:-67.8249}, AL:{nome:'Maceió',lat:-9.6498,lon:-35.7089},
+  AP:{nome:'Macapá',lat:0.0349,lon:-51.0694}, AM:{nome:'Manaus',lat:-3.1190,lon:-60.0217},
+  BA:{nome:'Salvador',lat:-12.9714,lon:-38.5014}, CE:{nome:'Fortaleza',lat:-3.7319,lon:-38.5267},
+  DF:{nome:'Brasília',lat:-15.7939,lon:-47.8828}, ES:{nome:'Vitória',lat:-20.3155,lon:-40.3128},
+  GO:{nome:'Goiânia',lat:-16.6869,lon:-49.2648}, MA:{nome:'São Luís',lat:-2.5297,lon:-44.3028},
+  MT:{nome:'Cuiabá',lat:-15.6014,lon:-56.0979}, MS:{nome:'Campo Grande',lat:-20.4697,lon:-54.6201},
+  MG:{nome:'Belo Horizonte',lat:-19.9167,lon:-43.9345}, PA:{nome:'Belém',lat:-1.4558,lon:-48.4902},
+  PB:{nome:'João Pessoa',lat:-7.1195,lon:-34.8450}, PR:{nome:'Curitiba',lat:-25.4284,lon:-49.2733},
+  PE:{nome:'Recife',lat:-8.0476,lon:-34.8770}, PI:{nome:'Teresina',lat:-5.0892,lon:-42.8019},
+  RJ:{nome:'Rio de Janeiro',lat:-22.9068,lon:-43.1729}, RN:{nome:'Natal',lat:-5.7945,lon:-35.2110},
+  RS:{nome:'Porto Alegre',lat:-30.0346,lon:-51.2177}, RO:{nome:'Porto Velho',lat:-8.7619,lon:-63.9039},
+  RR:{nome:'Boa Vista',lat:2.8235,lon:-60.6758}, SC:{nome:'Florianópolis',lat:-27.5954,lon:-48.5480},
+  SP:{nome:'São Paulo',lat:-23.5505,lon:-46.6333}, SE:{nome:'Aracaju',lat:-10.9472,lon:-37.0731},
+  TO:{nome:'Palmas',lat:-10.1689,lon:-48.3317}
+};
+
+function normalizarTexto(s){
+  return s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+}
+
+// Retorna as coordenadas fixas se a busca for por uma capital de estado
+// (com ou sem a UF junto) — null caso contrário, pra cair na geocodificação
+// normal.
+function coordenadasCapital(cidadeOriginal, partesUf){
+  if(partesUf){
+    const capital = CAPITAIS_BRASIL[partesUf.uf];
+    if(capital && normalizarTexto(capital.nome) === normalizarTexto(partesUf.cidade)){
+      return { ...capital, uf: partesUf.uf };
+    }
+    return null;
+  }
+  const alvo = normalizarTexto(cidadeOriginal);
+  for(const uf in CAPITAIS_BRASIL){
+    if(normalizarTexto(CAPITAIS_BRASIL[uf].nome) === alvo){
+      return { ...CAPITAIS_BRASIL[uf], uf };
+    }
+  }
+  return null;
+}
+
 function fetchComTimeout(url, opts = {}, timeoutMs = 12000){
   const signal = (typeof AbortSignal !== 'undefined' && AbortSignal.timeout)
     ? AbortSignal.timeout(timeoutMs)
@@ -887,6 +936,15 @@ function fetchComTimeout(url, opts = {}, timeoutMs = 12000){
 
 async function geocodificarCidade(cidadeOriginal){
   const partesUf = extrairCidadeEUf(cidadeOriginal);
+
+  // 0) Atalho local para capitais de estado — sem chamada de rede, sem
+  //    depender do comportamento (às vezes errático) da geocodificação
+  //    externa para o caso mais comum.
+  const capital = coordenadasCapital(cidadeOriginal, partesUf);
+  if(capital){
+    return { lat: capital.lat, lon: capital.lon, nomeExibicao: `${capital.nome}, ${capital.uf}, Brasil` };
+  }
+
   // 1) Nominatim. Quando dá pra identificar "Cidade + UF" (o caso mais
   //    comum), usa busca ESTRUTURADA (city=/state=/country=) — muito mais
   //    confiável que texto livre pra acertar o nível "cidade" exato.
