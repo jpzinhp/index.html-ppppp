@@ -845,18 +845,36 @@ const osmTagPorCategoria = {
 // brasileiras com homônimas em outros países e mantém a busca precisa).
 const BRASIL_BBOX = "-74.0,-34.0,-32.0,6.0"; // minLon,minLat,maxLon,maxLat
 
-const UFS_BRASIL = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+const UF_NOME = {
+  AC:'Acre', AL:'Alagoas', AP:'Amapá', AM:'Amazonas', BA:'Bahia', CE:'Ceará',
+  DF:'Distrito Federal', ES:'Espírito Santo', GO:'Goiás', MA:'Maranhão',
+  MT:'Mato Grosso', MS:'Mato Grosso do Sul', MG:'Minas Gerais', PA:'Pará',
+  PB:'Paraíba', PR:'Paraná', PE:'Pernambuco', PI:'Piauí', RJ:'Rio de Janeiro',
+  RN:'Rio Grande do Norte', RS:'Rio Grande do Sul', RO:'Rondônia', RR:'Roraima',
+  SC:'Santa Catarina', SP:'São Paulo', SE:'Sergipe', TO:'Tocantins'
+};
 
-// Texto livre tipo "São Paulo SP" é ambíguo para o geocodificador (pode
-// resolver para o ESTADO inteiro, cujo centro fica longe da capital, em
-// vez da cidade). Reformata com vírgulas ("São Paulo, SP, Brasil"), que o
-// Nominatim interpreta de forma muito mais confiável.
-function normalizarConsultaLocal(texto){
+// Texto livre tipo "São Paulo SP" é ambíguo pra um geocodificador de busca
+// livre: já vimos ele resolver para o ESTADO e até para a REGIÃO Sudeste
+// inteira (5 estados!) em vez da cidade — porque cidades brasileiras no
+// OSM também são um "limite administrativo", só que em outro nível, então
+// simplesmente evitar "tipo=administrativo" não resolve. A saída correta é
+// usar a busca ESTRUTURADA do Nominatim (city=/state=/country=), que força
+// o nível de detalhe certo em vez de adivinhar pelo texto livre.
+function extrairCidadeEUf(texto){
   const limpo = texto.trim();
   const m = limpo.match(/^(.+?)[\s,\-]+([A-Za-z]{2})$/);
-  if(m && UFS_BRASIL.includes(m[2].toUpperCase())){
-    return `${m[1].trim()}, ${m[2].toUpperCase()}, Brasil`;
+  if(m && UF_NOME[m[2].toUpperCase()]){
+    const uf = m[2].toUpperCase();
+    return { cidade: m[1].trim(), uf, ufNome: UF_NOME[uf] };
   }
+  return null;
+}
+
+function formatarConsultaLivre(texto){
+  const partes = extrairCidadeEUf(texto);
+  if(partes) return `${partes.cidade}, ${partes.ufNome}, Brasil`;
+  const limpo = texto.trim();
   return /brasil|brazil/i.test(limpo) ? limpo : `${limpo}, Brasil`;
 }
 
@@ -868,20 +886,23 @@ function fetchComTimeout(url, opts = {}, timeoutMs = 12000){
 }
 
 async function geocodificarCidade(cidadeOriginal){
-  const cidade = normalizarConsultaLocal(cidadeOriginal);
-  // 1) Nominatim, restrito ao Brasil (countrycodes=br) — mais preciso para
-  //    cidades, bairros e endereços em qualquer estado do país. Pede mais
-  //    de 1 resultado e prioriza cidade/vila/bairro sobre estado inteiro,
-  //    pra não confundir "São Paulo, SP" (cidade) com o estado de SP.
+  const partesUf = extrairCidadeEUf(cidadeOriginal);
+  // 1) Nominatim. Quando dá pra identificar "Cidade + UF" (o caso mais
+  //    comum), usa busca ESTRUTURADA (city=/state=/country=) — muito mais
+  //    confiável que texto livre pra acertar o nível "cidade" exato.
+  //    Sem UF identificável (bairro, endereço, etc.), cai para texto livre.
   try{
-    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=br&accept-language=pt-BR&limit=5&q=${encodeURIComponent(cidade)}`;
+    const url = partesUf
+      ? `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=br&accept-language=pt-BR&limit=1&city=${encodeURIComponent(partesUf.cidade)}&state=${encodeURIComponent(partesUf.ufNome)}&country=Brazil`
+      : `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=br&accept-language=pt-BR&limit=3&q=${encodeURIComponent(formatarConsultaLivre(cidadeOriginal))}`;
     const resp = await fetchComTimeout(url);
     if(resp.ok){
       const data = await resp.json();
-      // Evita pegar o resultado "estado inteiro" (type=administrative,
-      // ligado a um limite territorial) quando existe um resultado mais
-      // específico de cidade/vila/bairro na mesma resposta.
-      const melhor = (data||[]).find(d => d.type !== 'administrative') || (data && data[0]);
+      // Na busca estruturada confia no 1º resultado; na busca livre (sem
+      // UF) ainda evita pegar um resultado de estado/região inteiros.
+      const melhor = partesUf
+        ? (data && data[0])
+        : ((data||[]).find(d => d.type !== 'administrative') || (data && data[0]));
       if(melhor){
         return {
           lat: parseFloat(melhor.lat),
@@ -894,9 +915,11 @@ async function geocodificarCidade(cidadeOriginal){
     console.warn("Nominatim falhou, tentando Photon:", e.message);
   }
 
-  // 2) Photon como reserva, com viewbox limitado ao Brasil.
+  // 2) Photon como reserva, com viewbox limitado ao Brasil (só aceita
+  // texto livre, sem busca estruturada).
+  const consultaLivre = formatarConsultaLivre(cidadeOriginal);
   try{
-    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(cidade)}&limit=1&lang=pt&bbox=${BRASIL_BBOX}`;
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(consultaLivre)}&limit=1&lang=pt&bbox=${BRASIL_BBOX}`;
     const resp = await fetchComTimeout(url);
     if(resp.ok){
       const data = await resp.json();
@@ -910,7 +933,7 @@ async function geocodificarCidade(cidadeOriginal){
     console.warn("Photon também falhou:", e.message);
   }
 
-  throw new Error(`Não foi possível localizar "${cidade}" no Brasil. Confira a grafia da cidade/bairro.`);
+  throw new Error(`Não foi possível localizar "${cidadeOriginal}" no Brasil. Confira a grafia da cidade/bairro.`);
 }
 
 // Vários espelhos, de infraestruturas diferentes, para não depender de um
